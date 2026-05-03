@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0] — 2026-05-03
+
+### Added
+
+- `sleep-prevention` (Sub-projeto H) over `powerSaveBlocker`, idempotent.
+- `kiosk-mode` — full-screen + zoom/devtools blockers via `before-input-event`.
+- `deep-link` — `opensea://...` protocol handler with mac `open-url` + win/linux `second-instance` + initial argv dispatch.
+- 21 vitest tests.
+
 ## [0.8.0] — 2026-05-03
 
 ### Added

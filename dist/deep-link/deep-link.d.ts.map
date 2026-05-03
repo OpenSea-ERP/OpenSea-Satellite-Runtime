@@ -1,0 +1,1 @@
+{"version":3,"file":"deep-link.d.ts","sourceRoot":"","sources":["../../src/deep-link/deep-link.ts"],"names":[],"mappings":"AAYA,MAAM,WAAW,eAAe;IAC9B,QAAQ,EAAE,MAAM,CAAC;IACjB,KAAK,EAAE,CAAC,GAAG,EAAE,MAAM,KAAK,IAAI,CAAC;CAC9B;AAED,wBAAgB,gBAAgB,CAAC,OAAO,EAAE,eAAe,GAAG,IAAI,CAuD/D"}

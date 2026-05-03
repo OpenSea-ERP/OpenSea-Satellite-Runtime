@@ -1,6 +1,6 @@
 {
   "name": "@opensea/satellite-runtime",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "Runtime modules for OpenSea satellite Electron apps (lifecycle, boot, persistence, logging)",
   "private": true,
   "license": "PROPRIETARY",
@@ -37,6 +37,9 @@
     "./telemetry": { "types": "./dist/telemetry/index.d.ts", "require": "./dist/telemetry/index.js", "default": "./dist/telemetry/index.js" },
     "./export-logs": { "types": "./dist/export-logs/index.d.ts", "require": "./dist/export-logs/index.js", "default": "./dist/export-logs/index.js" },
     "./ui": { "types": "./dist/ui/index.d.ts", "default": "./dist/ui/index.js" },
+    "./sleep-prevention": { "types": "./dist/sleep-prevention/index.d.ts", "require": "./dist/sleep-prevention/index.js", "default": "./dist/sleep-prevention/index.js" },
+    "./kiosk-mode": { "types": "./dist/kiosk-mode/index.d.ts", "require": "./dist/kiosk-mode/index.js", "default": "./dist/kiosk-mode/index.js" },
+    "./deep-link": { "types": "./dist/deep-link/index.d.ts", "require": "./dist/deep-link/index.js", "default": "./dist/deep-link/index.js" },
     "./testing": { "types": "./dist/testing/index.d.ts", "require": "./dist/testing/index.js", "default": "./dist/testing/index.js" },
     "./package.json": "./package.json"
   },

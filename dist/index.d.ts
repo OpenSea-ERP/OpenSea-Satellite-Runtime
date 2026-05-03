@@ -15,4 +15,7 @@ export * from "./migrate-api-url";
 export * from "./crash-reporter";
 export * from "./telemetry";
 export * from "./export-logs";
+export * from "./sleep-prevention";
+export * from "./kiosk-mode";
+export * from "./deep-link";
 //# sourceMappingURL=index.d.ts.map

@@ -31,4 +31,7 @@ __exportStar(require("./migrate-api-url"), exports);
 __exportStar(require("./crash-reporter"), exports);
 __exportStar(require("./telemetry"), exports);
 __exportStar(require("./export-logs"), exports);
+__exportStar(require("./sleep-prevention"), exports);
+__exportStar(require("./kiosk-mode"), exports);
+__exportStar(require("./deep-link"), exports);
 //# sourceMappingURL=index.js.map
