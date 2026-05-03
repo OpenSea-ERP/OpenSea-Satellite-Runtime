@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.1] — 2026-05-03
+
+### Fixed
+
+- `ws-client`: `destroy()` now bumps `generation` so any in-flight `openSocket()`
+  awaiting `auth.token()` bails out before attaching listeners. Closes a
+  resurrection race where a client destroyed during async auth could still
+  create a live socket and transition back to `connected` (Codex post-impl
+  review BLOCKER).
+- `ws-client`: `handleErrorPath` now consults `shouldReconnect` BEFORE setting
+  state to `'reconnecting'`. Non-reconnectable closes (4001/4003 / custom veto)
+  now go directly `connected → closed` without a spurious `'reconnecting'`
+  transition (Codex review HIGH).
+- `ws-client`: `send()` now returns `boolean` reflecting whether the JSON was
+  handed to the socket (vs swallowed). Wrapper consumers can propagate
+  delivery success accurately (Codex review MEDIUM).
+- `ws-client`: post-await guards check `this.destroyed` in addition to
+  generation, hardening against any future async paths.
+
 ## [0.4.0] — 2026-05-03
 
 ### Added

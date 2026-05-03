@@ -102,8 +102,11 @@ export declare class SatelliteWSClient<TIn = unknown, TOut = unknown> extends Ev
     disconnect(): void;
     /** Permanent teardown. Idempotent. */
     destroy(): void;
-    /** Send a message. Drops with warn if not connected. */
-    send(message: TOut): void;
+    /**
+     * Send a message. Returns true if the JSON was handed to the socket;
+     * false if the client is not connected or the socket rejected the send.
+     */
+    send(message: TOut): boolean;
     private setState;
     private openSocket;
     private attachSocketListeners;

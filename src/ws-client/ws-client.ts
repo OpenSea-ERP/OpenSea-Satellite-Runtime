@@ -201,6 +201,9 @@ export class SatelliteWSClient<
   destroy(): void {
     if (this.destroyed) return;
     this.destroyed = true;
+    // Bump generation so any in-flight openSocket() awaiting auth.token()
+    // bails out before attaching listeners (Codex post-impl review fix #1).
+    this.generation += 1;
     this.cancelReconnect();
     this.cleanupHeartbeat();
     if (this.socket) {
@@ -216,16 +219,21 @@ export class SatelliteWSClient<
     this.removeAllListeners();
   }
 
-  /** Send a message. Drops with warn if not connected. */
-  send(message: TOut): void {
+  /**
+   * Send a message. Returns true if the JSON was handed to the socket;
+   * false if the client is not connected or the socket rejected the send.
+   */
+  send(message: TOut): boolean {
     if (this.state !== "connected" || !this.socket) {
       this.logger.warn(`send() called in state=${this.state}; dropping`);
-      return;
+      return false;
     }
     try {
       this.socket.send(JSON.stringify(message));
+      return true;
     } catch (err) {
       this.logger.error("send() failed:", err);
+      return false;
     }
   }
 
@@ -250,6 +258,11 @@ export class SatelliteWSClient<
       return;
     }
 
+    // Codex post-impl review fix #1: check destroyed/generation after every
+    // async boundary. destroy() bumps generation so this guard catches
+    // teardown that happened during the auth.token() await.
+    if (this.destroyed || myGeneration !== this.generation) return;
+
     if (!token) {
       this.logger.info("no auth token; entering waiting-auth state");
       this.setState("waiting-auth");
@@ -270,7 +283,7 @@ export class SatelliteWSClient<
       return;
     }
 
-    if (myGeneration !== this.generation) {
+    if (this.destroyed || myGeneration !== this.generation) {
       try {
         socket.close();
       } catch {
@@ -499,8 +512,10 @@ export class SatelliteWSClient<
     closeCode?: number,
   ): void {
     if (myGeneration !== this.generation || this.destroyed) return;
-    this.setState(phase === "close" ? "reconnecting" : "error");
 
+    // Codex post-impl review fix #3: decide reconnect FIRST so non-reconnectable
+    // closes (4001/4003 / shouldReconnect=false) don't emit a spurious
+    // 'reconnecting' transition before 'closed'.
     const decideFn = this.opts.shouldReconnect ?? defaultShouldReconnect;
     const should = decideFn({ closeCode, error: err, phase });
     if (!should) {

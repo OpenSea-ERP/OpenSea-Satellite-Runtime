@@ -112,6 +112,9 @@ class SatelliteWSClient extends node_events_1.EventEmitter {
         if (this.destroyed)
             return;
         this.destroyed = true;
+        // Bump generation so any in-flight openSocket() awaiting auth.token()
+        // bails out before attaching listeners (Codex post-impl review fix #1).
+        this.generation += 1;
         this.cancelReconnect();
         this.cleanupHeartbeat();
         if (this.socket) {
@@ -127,17 +130,22 @@ class SatelliteWSClient extends node_events_1.EventEmitter {
         this.setState("closed");
         this.removeAllListeners();
     }
-    /** Send a message. Drops with warn if not connected. */
+    /**
+     * Send a message. Returns true if the JSON was handed to the socket;
+     * false if the client is not connected or the socket rejected the send.
+     */
     send(message) {
         if (this.state !== "connected" || !this.socket) {
             this.logger.warn(`send() called in state=${this.state}; dropping`);
-            return;
+            return false;
         }
         try {
             this.socket.send(JSON.stringify(message));
+            return true;
         }
         catch (err) {
             this.logger.error("send() failed:", err);
+            return false;
         }
     }
     // ── Internal ─────────────────────────────────────────────────────────────
@@ -159,6 +167,11 @@ class SatelliteWSClient extends node_events_1.EventEmitter {
             this.handleAuthFailure(myGeneration);
             return;
         }
+        // Codex post-impl review fix #1: check destroyed/generation after every
+        // async boundary. destroy() bumps generation so this guard catches
+        // teardown that happened during the auth.token() await.
+        if (this.destroyed || myGeneration !== this.generation)
+            return;
         if (!token) {
             this.logger.info("no auth token; entering waiting-auth state");
             this.setState("waiting-auth");
@@ -177,7 +190,7 @@ class SatelliteWSClient extends node_events_1.EventEmitter {
             this.handleErrorPath(err, myGeneration, "open");
             return;
         }
-        if (myGeneration !== this.generation) {
+        if (this.destroyed || myGeneration !== this.generation) {
             try {
                 socket.close();
             }
@@ -382,7 +395,9 @@ class SatelliteWSClient extends node_events_1.EventEmitter {
     handleErrorPath(err, myGeneration, phase, closeCode) {
         if (myGeneration !== this.generation || this.destroyed)
             return;
-        this.setState(phase === "close" ? "reconnecting" : "error");
+        // Codex post-impl review fix #3: decide reconnect FIRST so non-reconnectable
+        // closes (4001/4003 / shouldReconnect=false) don't emit a spurious
+        // 'reconnecting' transition before 'closed'.
         const decideFn = this.opts.shouldReconnect ?? defaultShouldReconnect;
         const should = decideFn({ closeCode, error: err, phase });
         if (!should) {
