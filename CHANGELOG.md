@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] — 2026-05-03
+
+**🎉 First stable release.** All 9 sub-projetos do Satellite Kit entregues.
+
+### Added (Sub-projeto I)
+
+- `ipc-registry` — typed channel registration with zod payload validation; idempotent (warn on duplicate); standardized `{ ok, data | error }` response shape.
+- `feature-flags` — remote flag pull with cache, defaults, polling (5min default), `isEnabled/getString/snapshot` API, optional auth header, injectable fetch.
+- `i18n` — minimal Intl wrappers for date/time/number/currency/relative-time, default locale `pt-BR`, override per-call.
+- 22 vitest tests.
+
+### Stable surface (v1.0.0)
+
+22 modules total via sub-paths:
+
+- **A foundation:** auto-launch · window-state · single-instance · tray · splash · graceful-shutdown · store · log · quit-prompt
+- **B updater:** updater
+- **C connection:** ws-client · connection-state
+- **D identity:** secure-store · migrate-api-url
+- **E observability:** crash-reporter · telemetry · export-logs
+- **F UI:** ui (RevokedDialog · AboutDialog · UpdateBanner)
+- **G scaffolding:** `npx create-opensea-satellite`
+- **H hardware/OS:** sleep-prevention · kiosk-mode · deep-link
+- **I security/flags/i18n:** ipc-registry · feature-flags · i18n
+- **/testing:** mockApp · mockStore · mockTray · mockBrowserWindow
+
+180+ tests, ≥80% coverage, CJS dist commitado, distribuído via Git URL público.
+
 ## [0.9.0] — 2026-05-03
 
 ### Added

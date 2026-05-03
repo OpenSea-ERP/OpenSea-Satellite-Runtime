@@ -1,6 +1,6 @@
 {
   "name": "@opensea/satellite-runtime",
-  "version": "0.9.0",
+  "version": "1.0.0",
   "description": "Runtime modules for OpenSea satellite Electron apps (lifecycle, boot, persistence, logging)",
   "private": true,
   "license": "PROPRIETARY",
@@ -40,6 +40,9 @@
     "./sleep-prevention": { "types": "./dist/sleep-prevention/index.d.ts", "require": "./dist/sleep-prevention/index.js", "default": "./dist/sleep-prevention/index.js" },
     "./kiosk-mode": { "types": "./dist/kiosk-mode/index.d.ts", "require": "./dist/kiosk-mode/index.js", "default": "./dist/kiosk-mode/index.js" },
     "./deep-link": { "types": "./dist/deep-link/index.d.ts", "require": "./dist/deep-link/index.js", "default": "./dist/deep-link/index.js" },
+    "./ipc-registry": { "types": "./dist/ipc-registry/index.d.ts", "require": "./dist/ipc-registry/index.js", "default": "./dist/ipc-registry/index.js" },
+    "./feature-flags": { "types": "./dist/feature-flags/index.d.ts", "require": "./dist/feature-flags/index.js", "default": "./dist/feature-flags/index.js" },
+    "./i18n": { "types": "./dist/i18n/index.d.ts", "require": "./dist/i18n/index.js", "default": "./dist/i18n/index.js" },
     "./testing": { "types": "./dist/testing/index.d.ts", "require": "./dist/testing/index.js", "default": "./dist/testing/index.js" },
     "./package.json": "./package.json"
   },

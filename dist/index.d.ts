@@ -18,4 +18,7 @@ export * from "./export-logs";
 export * from "./sleep-prevention";
 export * from "./kiosk-mode";
 export * from "./deep-link";
+export * from "./ipc-registry";
+export * from "./feature-flags";
+export * from "./i18n";
 //# sourceMappingURL=index.d.ts.map

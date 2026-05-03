@@ -34,4 +34,7 @@ __exportStar(require("./export-logs"), exports);
 __exportStar(require("./sleep-prevention"), exports);
 __exportStar(require("./kiosk-mode"), exports);
 __exportStar(require("./deep-link"), exports);
+__exportStar(require("./ipc-registry"), exports);
+__exportStar(require("./feature-flags"), exports);
+__exportStar(require("./i18n"), exports);
 //# sourceMappingURL=index.js.map
