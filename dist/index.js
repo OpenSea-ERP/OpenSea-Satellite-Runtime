@@ -26,4 +26,6 @@ __exportStar(require("./quit-prompt"), exports);
 __exportStar(require("./updater"), exports);
 __exportStar(require("./ws-client"), exports);
 __exportStar(require("./connection-state"), exports);
+__exportStar(require("./secure-store"), exports);
+__exportStar(require("./migrate-api-url"), exports);
 //# sourceMappingURL=index.js.map

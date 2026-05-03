@@ -10,3 +10,5 @@ export * from "./quit-prompt";
 export * from "./updater";
 export * from "./ws-client";
 export * from "./connection-state";
+export * from "./secure-store";
+export * from "./migrate-api-url";

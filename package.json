@@ -1,6 +1,6 @@
 {
   "name": "@opensea/satellite-runtime",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "Runtime modules for OpenSea satellite Electron apps (lifecycle, boot, persistence, logging)",
   "private": true,
   "license": "PROPRIETARY",
@@ -28,6 +28,8 @@
     "./updater": { "types": "./dist/updater/index.d.ts", "require": "./dist/updater/index.js", "default": "./dist/updater/index.js" },
     "./ws-client": { "types": "./dist/ws-client/index.d.ts", "require": "./dist/ws-client/index.js", "default": "./dist/ws-client/index.js" },
     "./connection-state": { "types": "./dist/connection-state/index.d.ts", "require": "./dist/connection-state/index.js", "default": "./dist/connection-state/index.js" },
+    "./secure-store": { "types": "./dist/secure-store/index.d.ts", "require": "./dist/secure-store/index.js", "default": "./dist/secure-store/index.js" },
+    "./migrate-api-url": { "types": "./dist/migrate-api-url/index.d.ts", "require": "./dist/migrate-api-url/index.js", "default": "./dist/migrate-api-url/index.js" },
     "./testing": { "types": "./dist/testing/index.d.ts", "require": "./dist/testing/index.js", "default": "./dist/testing/index.js" },
     "./package.json": "./package.json"
   },
@@ -51,6 +53,7 @@
     "electron-log": "^5.1.7",
     "electron-store": "^8.2.0",
     "electron-updater": "^6.2.1",
+    "keytar": "^7.9.0",
     "ws": "^8.16.0",
     "zod": "^3.23.0"
   },

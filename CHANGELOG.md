@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] — 2026-05-03
+
+### Added
+
+- New `secure-store` module (Sub-projeto D). `createSecureStore({ service, testMode? })` returns `{ get, set, delete }`. Auto in-memory backend when `NODE_ENV=test` (Emporion gold standard) — Playwright suites do not pollute Credential Manager. Per-instance memory isolation across services.
+- New `migrate-api-url` module. `migrateApiUrl({ read, write, staleUrls, canonicalUrl })` extracts the identical pattern from PrintServer and Emporion. Default no-op in dev unless `force: true`.
+- 16 vitest tests covering test-mode + packaged-mode paths, error swallow contracts, multi-instance isolation, dev/force gates.
+- New dep: `keytar@^7.9.0`.
+
+### Notes
+
+- Pair flow, `RevokedDialog` UI, and audit trail kept satellite-specific (no
+  shared code among the 3 satellites). The runtime only ships the
+  primitives those flows compose with.
+
 ## [0.4.1] — 2026-05-03
 
 ### Fixed
