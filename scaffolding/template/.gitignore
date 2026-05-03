@@ -1,0 +1,8 @@
+node_modules/
+dist/
+release/
+*.log
+.vscode/
+.idea/
+coverage/
+.DS_Store

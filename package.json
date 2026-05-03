@@ -1,6 +1,6 @@
 {
   "name": "@opensea/satellite-runtime",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Runtime modules for OpenSea satellite Electron apps (lifecycle, boot, persistence, logging)",
   "private": true,
   "license": "PROPRIETARY",
@@ -14,6 +14,9 @@
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "bin": {
+    "create-opensea-satellite": "scaffolding/bin/create-opensea-satellite.js"
+  },
   "exports": {
     ".": { "types": "./dist/index.d.ts", "require": "./dist/index.js", "default": "./dist/index.js" },
     "./auto-launch": { "types": "./dist/auto-launch/index.d.ts", "require": "./dist/auto-launch/index.js", "default": "./dist/auto-launch/index.js" },
@@ -37,7 +40,7 @@
     "./testing": { "types": "./dist/testing/index.d.ts", "require": "./dist/testing/index.js", "default": "./dist/testing/index.js" },
     "./package.json": "./package.json"
   },
-  "files": ["dist", "README.md", "CHANGELOG.md", "LICENSE"],
+  "files": ["dist", "scaffolding", "README.md", "CHANGELOG.md", "LICENSE"],
   "engines": { "node": ">=20" },
   "scripts": {
     "build": "tsc -p tsconfig.json",

@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] — 2026-05-03
+
+### Added
+
+- New `create-opensea-satellite` CLI (Sub-projeto G). Run `npx create-opensea-satellite my-app` to scaffold a new Electron satellite pre-wired to the runtime, with `package.json` deps (contract + runtime + electron-builder + vite), `tsconfig.main.json` with the `paths` override for runtime sub-paths, `src/main/main.ts` showing the canonical boot sequence, GitHub Actions CI template (windows-latest runner), `.gitignore`, and a README explaining release flow.
+- `scaffolding/` directory now ships with the package (`files` includes it).
+
+### Notes
+
+- The CLI is intentionally minimal: no prompts, no template variants. Generates one canonical layout. Customize after scaffolding.
+- Template currently pins runtime `#v0.7.0` — bump on the next runtime release.
+
 ## [0.7.0] — 2026-05-03
 
 ### Added
