@@ -28,4 +28,7 @@ __exportStar(require("./ws-client"), exports);
 __exportStar(require("./connection-state"), exports);
 __exportStar(require("./secure-store"), exports);
 __exportStar(require("./migrate-api-url"), exports);
+__exportStar(require("./crash-reporter"), exports);
+__exportStar(require("./telemetry"), exports);
+__exportStar(require("./export-logs"), exports);
 //# sourceMappingURL=index.js.map

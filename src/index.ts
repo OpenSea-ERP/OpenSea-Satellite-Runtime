@@ -12,3 +12,6 @@ export * from "./ws-client";
 export * from "./connection-state";
 export * from "./secure-store";
 export * from "./migrate-api-url";
+export * from "./crash-reporter";
+export * from "./telemetry";
+export * from "./export-logs";

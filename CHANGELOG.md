@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] — 2026-05-03
+
+### Added
+
+- New `crash-reporter` module (Sub-projeto E). `setupCrashReporter({ submitURL, productName, ... })` wraps Electron's built-in `crashReporter` with idempotent setup and OpenSea defaults.
+- New `telemetry` module. `setupTelemetry({ endpoint, deviceId, appName, enabled, intervalMs?, fetchImpl? })` — opt-in (default `enabled: false`), no PII, ships `{ device_id, app_name, app_version, os, platform, locale, last_seen, custom? }` at boot + on a daily interval. Injectable `fetchImpl` for tests.
+- New `export-logs` module. `exportLogs({ sourceDir?, targetPath?, filter? })` reads all `.log` files under the satellite's log dir and writes them as a single concatenated UTF-8 file with section banners — useful for support handoff.
+- 20 vitest tests covering: idempotency, opt-in gate, daily interval, no-PII payload, network error swallow, custom targets, read failures noted inline.
+
+### Notes
+
+- Performance metrics module (boot time, memory, WS latency histograms) deferred — no shared code among satellites yet.
+
 ## [0.5.0] — 2026-05-03
 
 ### Added

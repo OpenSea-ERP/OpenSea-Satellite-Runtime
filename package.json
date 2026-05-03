@@ -1,6 +1,6 @@
 {
   "name": "@opensea/satellite-runtime",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Runtime modules for OpenSea satellite Electron apps (lifecycle, boot, persistence, logging)",
   "private": true,
   "license": "PROPRIETARY",
@@ -30,6 +30,9 @@
     "./connection-state": { "types": "./dist/connection-state/index.d.ts", "require": "./dist/connection-state/index.js", "default": "./dist/connection-state/index.js" },
     "./secure-store": { "types": "./dist/secure-store/index.d.ts", "require": "./dist/secure-store/index.js", "default": "./dist/secure-store/index.js" },
     "./migrate-api-url": { "types": "./dist/migrate-api-url/index.d.ts", "require": "./dist/migrate-api-url/index.js", "default": "./dist/migrate-api-url/index.js" },
+    "./crash-reporter": { "types": "./dist/crash-reporter/index.d.ts", "require": "./dist/crash-reporter/index.js", "default": "./dist/crash-reporter/index.js" },
+    "./telemetry": { "types": "./dist/telemetry/index.d.ts", "require": "./dist/telemetry/index.js", "default": "./dist/telemetry/index.js" },
+    "./export-logs": { "types": "./dist/export-logs/index.d.ts", "require": "./dist/export-logs/index.js", "default": "./dist/export-logs/index.js" },
     "./testing": { "types": "./dist/testing/index.d.ts", "require": "./dist/testing/index.js", "default": "./dist/testing/index.js" },
     "./package.json": "./package.json"
   },
