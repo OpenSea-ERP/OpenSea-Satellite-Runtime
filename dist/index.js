@@ -24,4 +24,6 @@ __exportStar(require("./store"), exports);
 __exportStar(require("./log"), exports);
 __exportStar(require("./quit-prompt"), exports);
 __exportStar(require("./updater"), exports);
+__exportStar(require("./ws-client"), exports);
+__exportStar(require("./connection-state"), exports);
 //# sourceMappingURL=index.js.map

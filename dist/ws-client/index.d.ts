@@ -1,0 +1,2 @@
+export { SatelliteWSClient, createWSClient, type SatelliteWSClientOptions, type WSClientState, type AuthMode, type ReconnectOptions, type HeartbeatOptions, type ShouldReconnectInfo, type ReleaseEventPayload, type RevokedEventPayload, } from "./ws-client";
+//# sourceMappingURL=index.d.ts.map

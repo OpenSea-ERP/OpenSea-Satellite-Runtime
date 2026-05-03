@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] — 2026-05-03
+
+### Added
+
+- New `ws-client` module (Sub-projeto C). Class `SatelliteWSClient` with idempotent `connect()`, exponential backoff + jitter reconnect, heartbeat (ping + pong watchdog + optional app-level), per-socket generation guard for stale event isolation, built-in routing of Satellite Contract `app.release.published` (with wire-name normalization via `fromWireSatelliteKind`) + `device.revoked` events.
+- Auth modes: `bearer-header` and `hello-message` (custom mode + socket.io adapter deferred to v0.4.x).
+- `shouldReconnect({ closeCode, error, phase })` hook with default that refuses reconnect on close codes 4001 (auth fail) and 4003 (revoked).
+- `waiting-auth` state for token-null pre-pair scenario; `connect()` is re-entrant after token appears.
+- Injectable `WebSocketImpl` and `jitterFn` for deterministic tests.
+- New `connection-state` module — narrow IPC broadcaster for `connection:status` payload, with `isDestroyed()` guard. Does NOT poll or derive from multiple sources; satellites combine WS state + this broadcaster.
+- 35 vitest tests using stateful `FakeWebSocket` (per-instance event control), covering: lifecycle, reconnect, heartbeat cleanup on every path, generation ownership (late close from old socket ignored), routeShared kind filter (canonical + wire), validator drop, swallowed handler throws.
+- `@opensea/satellite-contract` is now a direct dependency (was unused before).
+- New deps: `ws@^8.16.0`, `@types/ws` devDep.
+
+### Notes
+
+- Bug fixes integrados durante extraction:
+  - heartbeat cleanup em todos os paths (open close/error/destroy/heartbeat-timeout)
+  - multi-call `connect()` em estados ativos é no-op com warn (Horus tinha race aqui)
+  - generation guard previne late events de socket antigo poluírem state do novo
+- Migration aceita validators e domain handlers passados pelo satélite (transport-only no runtime).
+
 ## [0.3.1] — 2026-05-03
 
 ### Fixed

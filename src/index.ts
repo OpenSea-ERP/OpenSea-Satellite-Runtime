@@ -8,3 +8,5 @@ export * from "./store";
 export * from "./log";
 export * from "./quit-prompt";
 export * from "./updater";
+export * from "./ws-client";
+export * from "./connection-state";
