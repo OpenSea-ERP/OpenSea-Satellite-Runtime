@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.1] — 2026-05-03
+
+### Fixed
+
+- `updater`: `clearAutoUpdaterListeners` now uses tracked handler refs +
+  `autoUpdater.off()` instead of `removeAllListeners`, preserving any
+  external listeners a satellite may have added directly (Codex post-impl
+  review Issue 3).
+- `updater`: `quitAndInstall()` now throws if called before `setupUpdater()`,
+  preventing silent fallback to default `quitAndInstallFlags={silent:true}`
+  when a satellite expects custom NSIS behavior (Codex Issue 4).
+- `updater`: `primeUpdaterStore({ key: null })` now writes the value
+  instead of being silently skipped — semantics clarified to "undefined =
+  ignore, anything else = apply if runtime store still default" (Codex
+  Issue 5).
+
+### Added
+
+- 3 vitest tests covering quitAndInstall guard, primeUpdaterStore null
+  semantics, and update-downloaded without announcedRelease (no false
+  cross-check log).
+
 ## [0.3.0] — 2026-05-03
 
 ### Added

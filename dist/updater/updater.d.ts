@@ -97,6 +97,11 @@ export declare function checkForUpdates(): Promise<void>;
  * Quit the app and install the downloaded update. Clears persisted
  * `pendingUpdateVersion` first so a partial install isn't re-announced on
  * the next boot.
+ *
+ * Throws if called before `setupUpdater()` — without setup, the resolved
+ * `quitAndInstallFlags` would silently fall back to the runtime default
+ * `(true, true)`, which is wrong for any satellite that needs a custom
+ * NSIS behavior (Codex post-impl review fix Issue 4).
  */
 export declare function quitAndInstall(): void;
 /**
@@ -113,6 +118,16 @@ export declare function recordAnnouncedRelease(release: AnnouncedRelease): void;
  * during migration to the runtime). Idempotent — only writes a key if its
  * current value is the schema default (null), so subsequent calls cannot
  * clobber explicit user/runtime writes.
+ *
+ * Semantics for each seed key:
+ *   - `undefined`     → ignored (no write)
+ *   - `null` or value → applied IF the runtime store still holds the
+ *                       schema default (null); otherwise ignored
+ *
+ * Passing `null` explicitly is allowed so a satellite can write a "known
+ * empty" marker during bridge — but in practice the bridge in main.ts
+ * already gates on legacy values being non-null before calling, so the
+ * null path is mostly defensive (Codex post-impl review fix Issue 5).
  */
 export declare function primeUpdaterStore(seed: Partial<UpdaterPrefs>): void;
 /** @internal — for tests */

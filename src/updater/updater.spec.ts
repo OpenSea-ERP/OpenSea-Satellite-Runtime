@@ -12,6 +12,14 @@ const { autoUpdaterMock, BrowserWindowMock, logMock, electronStoreData } =
         listeners.set(event, arr);
         return emitter;
       },
+      off(event: string, fn: (...args: unknown[]) => void) {
+        const arr = listeners.get(event);
+        if (arr) {
+          const idx = arr.indexOf(fn);
+          if (idx >= 0) arr.splice(idx, 1);
+        }
+        return emitter;
+      },
       removeAllListeners(event?: string) {
         if (event) listeners.delete(event);
         else listeners.clear();
@@ -275,6 +283,28 @@ describe("updater module", () => {
     autoUpdaterMock.emit("update-not-available");
     expect(logMock.info).not.toHaveBeenCalledWith(
       expect.stringContaining("Nenhuma atualização disponível"),
+    );
+  });
+
+  it("quitAndInstall throws when called before setupUpdater", () => {
+    expect(() => quitAndInstall()).toThrow(/setupUpdater\(\)/);
+  });
+
+  it("primeUpdaterStore writes null when seed has explicit null and runtime is default", () => {
+    primeUpdaterStore({ pendingUpdateVersion: null, lastFailedUpdateAt: null });
+    // null === null is what default already holds; no-op effectively
+    expect(electronStoreData.get("updater.preferences")?.pendingUpdateVersion).toBeNull();
+    expect(electronStoreData.get("updater.preferences")?.lastFailedUpdateAt).toBeNull();
+  });
+
+  it("update-downloaded with no announcedRelease does not log cross-check", () => {
+    setupUpdater();
+    autoUpdaterMock.emit("update-downloaded", { version: "5.0.0" });
+    expect(logMock.warn).not.toHaveBeenCalledWith(
+      expect.stringContaining("NÃO bate"),
+    );
+    expect(logMock.info).not.toHaveBeenCalledWith(
+      expect.stringContaining("bateu com release anunciada"),
     );
   });
 

@@ -85,13 +85,32 @@ function clearInternalTimers() {
         pendingReemitTimer = null;
     }
 }
+const registeredHandlers = {};
 function clearAutoUpdaterListeners() {
-    electron_updater_1.autoUpdater.removeAllListeners("checking-for-update");
-    electron_updater_1.autoUpdater.removeAllListeners("update-available");
-    electron_updater_1.autoUpdater.removeAllListeners("update-not-available");
-    electron_updater_1.autoUpdater.removeAllListeners("download-progress");
-    electron_updater_1.autoUpdater.removeAllListeners("update-downloaded");
-    electron_updater_1.autoUpdater.removeAllListeners("error");
+    if (registeredHandlers.checking) {
+        electron_updater_1.autoUpdater.off("checking-for-update", registeredHandlers.checking);
+        registeredHandlers.checking = undefined;
+    }
+    if (registeredHandlers.available) {
+        electron_updater_1.autoUpdater.off("update-available", registeredHandlers.available);
+        registeredHandlers.available = undefined;
+    }
+    if (registeredHandlers.notAvailable) {
+        electron_updater_1.autoUpdater.off("update-not-available", registeredHandlers.notAvailable);
+        registeredHandlers.notAvailable = undefined;
+    }
+    if (registeredHandlers.progress) {
+        electron_updater_1.autoUpdater.off("download-progress", registeredHandlers.progress);
+        registeredHandlers.progress = undefined;
+    }
+    if (registeredHandlers.downloaded) {
+        electron_updater_1.autoUpdater.off("update-downloaded", registeredHandlers.downloaded);
+        registeredHandlers.downloaded = undefined;
+    }
+    if (registeredHandlers.error) {
+        electron_updater_1.autoUpdater.off("error", registeredHandlers.error);
+        registeredHandlers.error = undefined;
+    }
 }
 function isBenignReleasesAtom404(err) {
     const message = err instanceof Error ? err.message : String(err ?? "");
@@ -150,25 +169,27 @@ function setupUpdater(options = {}) {
     if (options.channel) {
         electron_updater_1.autoUpdater.channel = options.channel;
     }
-    electron_updater_1.autoUpdater.on("checking-for-update", () => {
+    // Register handlers via tracked refs so re-init can off() only OUR
+    // listeners, preserving any external ones (Codex Issue 3).
+    registeredHandlers.checking = () => {
         electron_log_1.default.info("[satellite-runtime/updater] Verificando atualizações...");
         broadcast({ status: "checking" });
-    });
-    electron_updater_1.autoUpdater.on("update-available", (info) => {
+    };
+    registeredHandlers.available = (info) => {
         electron_log_1.default.info("[satellite-runtime/updater] Atualização disponível:", info.version);
         if (announcedRelease && announcedRelease.version !== info.version) {
             electron_log_1.default.warn(`[satellite-runtime/updater] Versão divergente: backend anunciou ${announcedRelease.version} via WS, electron-updater encontrou ${info.version}.`);
         }
         broadcast({ status: "available", version: info.version });
-    });
-    electron_updater_1.autoUpdater.on("update-not-available", () => {
+    };
+    registeredHandlers.notAvailable = () => {
         electron_log_1.default.info("[satellite-runtime/updater] Nenhuma atualização disponível");
         broadcast({ status: "up-to-date" });
-    });
-    electron_updater_1.autoUpdater.on("download-progress", (progress) => {
+    };
+    registeredHandlers.progress = (progress) => {
         broadcast({ status: "downloading", progress: progress.percent });
-    });
-    electron_updater_1.autoUpdater.on("update-downloaded", (info) => {
+    };
+    registeredHandlers.downloaded = (info) => {
         electron_log_1.default.info("[satellite-runtime/updater] Atualização baixada:", info.version);
         if (announcedRelease) {
             if (announcedRelease.version === info.version) {
@@ -180,8 +201,14 @@ function setupUpdater(options = {}) {
         }
         getPrefStore().set("pendingUpdateVersion", info.version);
         broadcast({ status: "downloaded", version: info.version });
-    });
-    electron_updater_1.autoUpdater.on("error", reportError);
+    };
+    registeredHandlers.error = reportError;
+    electron_updater_1.autoUpdater.on("checking-for-update", registeredHandlers.checking);
+    electron_updater_1.autoUpdater.on("update-available", registeredHandlers.available);
+    electron_updater_1.autoUpdater.on("update-not-available", registeredHandlers.notAvailable);
+    electron_updater_1.autoUpdater.on("download-progress", registeredHandlers.progress);
+    electron_updater_1.autoUpdater.on("update-downloaded", registeredHandlers.downloaded);
+    electron_updater_1.autoUpdater.on("error", registeredHandlers.error);
     // Re-emit pending update from previous session, after small delay so the
     // renderer is ready to receive.
     const pending = getPrefStore().get("pendingUpdateVersion");
@@ -234,8 +261,16 @@ async function checkForUpdates() {
  * Quit the app and install the downloaded update. Clears persisted
  * `pendingUpdateVersion` first so a partial install isn't re-announced on
  * the next boot.
+ *
+ * Throws if called before `setupUpdater()` — without setup, the resolved
+ * `quitAndInstallFlags` would silently fall back to the runtime default
+ * `(true, true)`, which is wrong for any satellite that needs a custom
+ * NSIS behavior (Codex post-impl review fix Issue 4).
  */
 function quitAndInstall() {
+    if (!initialized) {
+        throw new Error("[satellite-runtime/updater] quitAndInstall() called before setupUpdater(). Call setupUpdater() first to apply quitAndInstallFlags.");
+    }
     getPrefStore().set("pendingUpdateVersion", null);
     const flags = resolvedFlags ?? { silent: true, forceRunAfter: true };
     electron_updater_1.autoUpdater.quitAndInstall(flags.silent, flags.forceRunAfter);
@@ -257,16 +292,24 @@ function recordAnnouncedRelease(release) {
  * during migration to the runtime). Idempotent — only writes a key if its
  * current value is the schema default (null), so subsequent calls cannot
  * clobber explicit user/runtime writes.
+ *
+ * Semantics for each seed key:
+ *   - `undefined`     → ignored (no write)
+ *   - `null` or value → applied IF the runtime store still holds the
+ *                       schema default (null); otherwise ignored
+ *
+ * Passing `null` explicitly is allowed so a satellite can write a "known
+ * empty" marker during bridge — but in practice the bridge in main.ts
+ * already gates on legacy values being non-null before calling, so the
+ * null path is mostly defensive (Codex post-impl review fix Issue 5).
  */
 function primeUpdaterStore(seed) {
     const store = getPrefStore();
     if (seed.pendingUpdateVersion !== undefined &&
-        seed.pendingUpdateVersion !== null &&
         store.get("pendingUpdateVersion") === null) {
         store.set("pendingUpdateVersion", seed.pendingUpdateVersion);
     }
     if (seed.lastFailedUpdateAt !== undefined &&
-        seed.lastFailedUpdateAt !== null &&
         store.get("lastFailedUpdateAt") === null) {
         store.set("lastFailedUpdateAt", seed.lastFailedUpdateAt);
     }

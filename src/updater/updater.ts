@@ -147,13 +147,47 @@ function clearInternalTimers(): void {
   }
 }
 
+/**
+ * Listener references registered by THIS module on the singleton
+ * `autoUpdater`. We track them so re-init can `off()` only our handlers,
+ * preserving any external listeners a satellite may have added directly
+ * (Codex post-impl review fix Issue 3).
+ */
+interface RegisteredHandlers {
+  checking?: () => void;
+  available?: (info: { version: string }) => void;
+  notAvailable?: () => void;
+  progress?: (progress: { percent: number }) => void;
+  downloaded?: (info: { version: string }) => void;
+  error?: (err: unknown) => void;
+}
+const registeredHandlers: RegisteredHandlers = {};
+
 function clearAutoUpdaterListeners(): void {
-  autoUpdater.removeAllListeners("checking-for-update");
-  autoUpdater.removeAllListeners("update-available");
-  autoUpdater.removeAllListeners("update-not-available");
-  autoUpdater.removeAllListeners("download-progress");
-  autoUpdater.removeAllListeners("update-downloaded");
-  autoUpdater.removeAllListeners("error");
+  if (registeredHandlers.checking) {
+    autoUpdater.off("checking-for-update", registeredHandlers.checking);
+    registeredHandlers.checking = undefined;
+  }
+  if (registeredHandlers.available) {
+    autoUpdater.off("update-available", registeredHandlers.available);
+    registeredHandlers.available = undefined;
+  }
+  if (registeredHandlers.notAvailable) {
+    autoUpdater.off("update-not-available", registeredHandlers.notAvailable);
+    registeredHandlers.notAvailable = undefined;
+  }
+  if (registeredHandlers.progress) {
+    autoUpdater.off("download-progress", registeredHandlers.progress);
+    registeredHandlers.progress = undefined;
+  }
+  if (registeredHandlers.downloaded) {
+    autoUpdater.off("update-downloaded", registeredHandlers.downloaded);
+    registeredHandlers.downloaded = undefined;
+  }
+  if (registeredHandlers.error) {
+    autoUpdater.off("error", registeredHandlers.error);
+    registeredHandlers.error = undefined;
+  }
 }
 
 function isBenignReleasesAtom404(err: unknown): boolean {
@@ -227,12 +261,13 @@ export function setupUpdater(options: SetupUpdaterOptions = {}): UpdaterHandle {
     autoUpdater.channel = options.channel;
   }
 
-  autoUpdater.on("checking-for-update", () => {
+  // Register handlers via tracked refs so re-init can off() only OUR
+  // listeners, preserving any external ones (Codex Issue 3).
+  registeredHandlers.checking = () => {
     log.info("[satellite-runtime/updater] Verificando atualizações...");
     broadcast({ status: "checking" });
-  });
-
-  autoUpdater.on("update-available", (info) => {
+  };
+  registeredHandlers.available = (info) => {
     log.info("[satellite-runtime/updater] Atualização disponível:", info.version);
     if (announcedRelease && announcedRelease.version !== info.version) {
       log.warn(
@@ -240,18 +275,15 @@ export function setupUpdater(options: SetupUpdaterOptions = {}): UpdaterHandle {
       );
     }
     broadcast({ status: "available", version: info.version });
-  });
-
-  autoUpdater.on("update-not-available", () => {
+  };
+  registeredHandlers.notAvailable = () => {
     log.info("[satellite-runtime/updater] Nenhuma atualização disponível");
     broadcast({ status: "up-to-date" });
-  });
-
-  autoUpdater.on("download-progress", (progress) => {
+  };
+  registeredHandlers.progress = (progress) => {
     broadcast({ status: "downloading", progress: progress.percent });
-  });
-
-  autoUpdater.on("update-downloaded", (info) => {
+  };
+  registeredHandlers.downloaded = (info) => {
     log.info("[satellite-runtime/updater] Atualização baixada:", info.version);
     if (announcedRelease) {
       if (announcedRelease.version === info.version) {
@@ -266,9 +298,15 @@ export function setupUpdater(options: SetupUpdaterOptions = {}): UpdaterHandle {
     }
     getPrefStore().set("pendingUpdateVersion", info.version);
     broadcast({ status: "downloaded", version: info.version });
-  });
+  };
+  registeredHandlers.error = reportError;
 
-  autoUpdater.on("error", reportError);
+  autoUpdater.on("checking-for-update", registeredHandlers.checking);
+  autoUpdater.on("update-available", registeredHandlers.available);
+  autoUpdater.on("update-not-available", registeredHandlers.notAvailable);
+  autoUpdater.on("download-progress", registeredHandlers.progress);
+  autoUpdater.on("update-downloaded", registeredHandlers.downloaded);
+  autoUpdater.on("error", registeredHandlers.error);
 
   // Re-emit pending update from previous session, after small delay so the
   // renderer is ready to receive.
@@ -330,8 +368,18 @@ export async function checkForUpdates(): Promise<void> {
  * Quit the app and install the downloaded update. Clears persisted
  * `pendingUpdateVersion` first so a partial install isn't re-announced on
  * the next boot.
+ *
+ * Throws if called before `setupUpdater()` — without setup, the resolved
+ * `quitAndInstallFlags` would silently fall back to the runtime default
+ * `(true, true)`, which is wrong for any satellite that needs a custom
+ * NSIS behavior (Codex post-impl review fix Issue 4).
  */
 export function quitAndInstall(): void {
+  if (!initialized) {
+    throw new Error(
+      "[satellite-runtime/updater] quitAndInstall() called before setupUpdater(). Call setupUpdater() first to apply quitAndInstallFlags.",
+    );
+  }
   getPrefStore().set("pendingUpdateVersion", null);
   const flags = resolvedFlags ?? { silent: true, forceRunAfter: true };
   autoUpdater.quitAndInstall(flags.silent, flags.forceRunAfter);
@@ -357,19 +405,27 @@ export function recordAnnouncedRelease(release: AnnouncedRelease): void {
  * during migration to the runtime). Idempotent — only writes a key if its
  * current value is the schema default (null), so subsequent calls cannot
  * clobber explicit user/runtime writes.
+ *
+ * Semantics for each seed key:
+ *   - `undefined`     → ignored (no write)
+ *   - `null` or value → applied IF the runtime store still holds the
+ *                       schema default (null); otherwise ignored
+ *
+ * Passing `null` explicitly is allowed so a satellite can write a "known
+ * empty" marker during bridge — but in practice the bridge in main.ts
+ * already gates on legacy values being non-null before calling, so the
+ * null path is mostly defensive (Codex post-impl review fix Issue 5).
  */
 export function primeUpdaterStore(seed: Partial<UpdaterPrefs>): void {
   const store = getPrefStore();
   if (
     seed.pendingUpdateVersion !== undefined &&
-    seed.pendingUpdateVersion !== null &&
     store.get("pendingUpdateVersion") === null
   ) {
     store.set("pendingUpdateVersion", seed.pendingUpdateVersion);
   }
   if (
     seed.lastFailedUpdateAt !== undefined &&
-    seed.lastFailedUpdateAt !== null &&
     store.get("lastFailedUpdateAt") === null
   ) {
     store.set("lastFailedUpdateAt", seed.lastFailedUpdateAt);
