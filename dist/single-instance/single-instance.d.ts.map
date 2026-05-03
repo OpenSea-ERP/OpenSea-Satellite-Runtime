@@ -1,0 +1,1 @@
+{"version":3,"file":"single-instance.d.ts","sourceRoot":"","sources":["../../src/single-instance/single-instance.ts"],"names":[],"mappings":"AAEA,MAAM,WAAW,2BAA2B;IAC1C,gBAAgB,CAAC,EAAE,CAAC,IAAI,EAAE,MAAM,EAAE,EAAE,GAAG,EAAE,MAAM,KAAK,IAAI,CAAC;CAC1D;AAED,wBAAgB,oBAAoB,CAClC,OAAO,GAAE,2BAAgC,GACxC,IAAI,CAWN"}

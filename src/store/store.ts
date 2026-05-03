@@ -73,6 +73,15 @@ function recoverFromCorruption(
 export function createStore<S extends ZodType>(
   options: CreateStoreOptions<S>,
 ): SatelliteStore<S> {
+  // Validate the supplied defaults up front — a typo in the consumer's
+  // defaults object should fail loudly here, not at first read in prod.
+  const defaultsParse = options.schema.safeParse(options.defaults);
+  if (!defaultsParse.success) {
+    throw new Error(
+      `[satellite-runtime/store:${options.name}] defaults fail schema validation: ${defaultsParse.error.message}`,
+    );
+  }
+
   let electronStore: ElectronStore<Record<string, unknown>>;
   try {
     electronStore = tryConstruct(options);
@@ -93,6 +102,14 @@ export function createStore<S extends ZodType>(
         path: (electronStore as unknown as { path?: string }).path,
       }),
     );
+    // Re-validate after recovery. If recovered state still fails, throw —
+    // we cannot keep recovering in a loop and the satellite needs to know.
+    const recoveredParse = options.schema.safeParse(electronStore.store);
+    if (!recoveredParse.success) {
+      throw new Error(
+        `[satellite-runtime/store:${options.name}] recovered state still fails schema: ${recoveredParse.error.message}`,
+      );
+    }
   }
 
   return {
