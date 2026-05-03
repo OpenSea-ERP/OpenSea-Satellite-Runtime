@@ -1,0 +1,59 @@
+{
+  "name": "@opensea/satellite-runtime",
+  "version": "0.2.0-dev",
+  "description": "Runtime modules for OpenSea satellite Electron apps (lifecycle, boot, persistence, logging)",
+  "private": true,
+  "license": "PROPRIETARY",
+  "author": {
+    "name": "OpenSea ERP",
+    "email": "contato@opensea.com.br"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OpenSea-ERP/OpenSea-Satellite-Runtime.git"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "require": "./dist/index.js", "default": "./dist/index.js" },
+    "./auto-launch": { "types": "./dist/auto-launch/index.d.ts", "require": "./dist/auto-launch/index.js", "default": "./dist/auto-launch/index.js" },
+    "./window-state": { "types": "./dist/window-state/index.d.ts", "require": "./dist/window-state/index.js", "default": "./dist/window-state/index.js" },
+    "./single-instance": { "types": "./dist/single-instance/index.d.ts", "require": "./dist/single-instance/index.js", "default": "./dist/single-instance/index.js" },
+    "./tray": { "types": "./dist/tray/index.d.ts", "require": "./dist/tray/index.js", "default": "./dist/tray/index.js" },
+    "./splash": { "types": "./dist/splash/index.d.ts", "require": "./dist/splash/index.js", "default": "./dist/splash/index.js" },
+    "./graceful-shutdown": { "types": "./dist/graceful-shutdown/index.d.ts", "require": "./dist/graceful-shutdown/index.js", "default": "./dist/graceful-shutdown/index.js" },
+    "./store": { "types": "./dist/store/index.d.ts", "require": "./dist/store/index.js", "default": "./dist/store/index.js" },
+    "./log": { "types": "./dist/log/index.d.ts", "require": "./dist/log/index.js", "default": "./dist/log/index.js" },
+    "./quit-prompt": { "types": "./dist/quit-prompt/index.d.ts", "require": "./dist/quit-prompt/index.js", "default": "./dist/quit-prompt/index.js" },
+    "./testing": { "types": "./dist/testing/index.d.ts", "require": "./dist/testing/index.js", "default": "./dist/testing/index.js" },
+    "./package.json": "./package.json"
+  },
+  "files": ["dist", "README.md", "CHANGELOG.md", "LICENSE"],
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "rimraf dist",
+    "rebuild": "npm run clean && npm run build",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "peerDependencies": {
+    "electron": ">=33"
+  },
+  "dependencies": {
+    "auto-launch": "^5.0.6",
+    "electron-log": "^5.1.7",
+    "electron-store": "^8.2.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/auto-launch": "^5.0.5",
+    "@types/node": "20.16.0",
+    "@vitest/coverage-v8": "1.6.0",
+    "rimraf": "5.0.10",
+    "typescript": "5.6.3",
+    "vitest": "1.6.0"
+  }
+}
