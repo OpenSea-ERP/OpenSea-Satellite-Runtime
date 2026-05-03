@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] — 2026-05-03
+
+### Added
+
+- New `ui` sub-path (Sub-projeto F) — headless React components for renderers. Imported via `@opensea/satellite-runtime/ui`.
+- `RevokedDialog` — full-screen modal for `device.revoked` events.
+- `AboutDialog` — modal showing app version + channel + build + links.
+- `UpdateBanner` — top banner with status (checking/available/downloading/downloaded/error) + "Reiniciar e instalar" button.
+- All 3 components are zero-dependency (inline styles, no CSS framework required), accept `className` for design-system overrides, fully typed React 18/19 props.
+- New peer dep: `react@>=18` (optional — runtime modules outside `/ui` work without React).
+- New devDep: `@types/react@^19.0.0`.
+- TS config gained `jsx: 'react-jsx'`; `tsx` files included in build.
+
+### Notes
+
+- Lock screen (PIN gate, Emporion-only today), Toast/notification surface, Settings page base, theme toggle DEFERRED — sufficient surface here for v0.7.0; expand on demand.
+
 ## [0.6.0] — 2026-05-03
 
 ### Added

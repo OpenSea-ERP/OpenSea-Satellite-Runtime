@@ -1,6 +1,6 @@
 {
   "name": "@opensea/satellite-runtime",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Runtime modules for OpenSea satellite Electron apps (lifecycle, boot, persistence, logging)",
   "private": true,
   "license": "PROPRIETARY",
@@ -33,6 +33,7 @@
     "./crash-reporter": { "types": "./dist/crash-reporter/index.d.ts", "require": "./dist/crash-reporter/index.js", "default": "./dist/crash-reporter/index.js" },
     "./telemetry": { "types": "./dist/telemetry/index.d.ts", "require": "./dist/telemetry/index.js", "default": "./dist/telemetry/index.js" },
     "./export-logs": { "types": "./dist/export-logs/index.d.ts", "require": "./dist/export-logs/index.js", "default": "./dist/export-logs/index.js" },
+    "./ui": { "types": "./dist/ui/index.d.ts", "default": "./dist/ui/index.js" },
     "./testing": { "types": "./dist/testing/index.d.ts", "require": "./dist/testing/index.js", "default": "./dist/testing/index.js" },
     "./package.json": "./package.json"
   },
@@ -48,7 +49,11 @@
     "test:coverage": "vitest run --coverage"
   },
   "peerDependencies": {
-    "electron": ">=33"
+    "electron": ">=33",
+    "react": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "react": { "optional": true }
   },
   "dependencies": {
     "@opensea/satellite-contract": "git+https://github.com/OpenSea-ERP/OpenSea-Satellite-Contract.git#v0.1.0",
@@ -63,6 +68,7 @@
   "devDependencies": {
     "@types/auto-launch": "^5.0.5",
     "@types/node": "20.16.0",
+    "@types/react": "^19.0.0",
     "@types/ws": "^8.5.10",
     "@vitest/coverage-v8": "1.6.0",
     "rimraf": "5.0.10",
