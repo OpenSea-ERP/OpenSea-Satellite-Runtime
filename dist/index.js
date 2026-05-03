@@ -23,4 +23,5 @@ __exportStar(require("./graceful-shutdown"), exports);
 __exportStar(require("./store"), exports);
 __exportStar(require("./log"), exports);
 __exportStar(require("./quit-prompt"), exports);
+__exportStar(require("./updater"), exports);
 //# sourceMappingURL=index.js.map

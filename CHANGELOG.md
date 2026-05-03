@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] — 2026-05-03
+
+### Added
+
+- New `updater` module (Sub-projeto B). Sub-path `@opensea/satellite-runtime/updater`.
+- API: `setupUpdater(options)` (idempotent), `checkForUpdates()`, `quitAndInstall()`, `recordAnnouncedRelease(release)`, `primeUpdaterStore(seed)`.
+- Constants: `RETRY_24H`, `CHECK_INTERVAL_6H`.
+- Internal persistence via `createStore({ name: 'updater.preferences' })` — satellites do not mount the store.
+- Optional features: `channel: 'latest' | 'beta'`, `suppressBenignReleasesAtom404` (Emporion-style), `quitAndInstallFlags` override (default silent), custom `ipcChannel`, custom retry/check intervals.
+- `recordAnnouncedRelease()` cross-checks the version `electron-updater` downloads against a Satellite Contract `app.release.published` announcement (same-session best-effort; not persisted).
+- `isDestroyed()` guard mandatory on every IPC broadcast.
+- `primeUpdaterStore()` for satellites bridging legacy `pendingUpdateVersion`/`lastFailedUpdateAt` from their own store during migration. Idempotent (does not clobber non-default values).
+- 25 vitest tests covering idempotency, broadcast, persistence, retry, periodic check, channel, 404 suppression, WS cross-check, prime/bridge.
+- New peer-friendly dep: `electron-updater@^6.2.1`.
+
+### Notes
+
+- `devGuard` does NOT apply to `updater` — `electron-updater` already degrades gracefully in dev (`!app.isPackaged`).
+- For the `channel: 'beta'` option to work, the satellite must publish `latest-beta.yml` artifacts on GitHub Releases (see `electron-builder` channel docs).
+- Emporion adopting this module must pass `suppressBenignReleasesAtom404: true` to preserve its current behavior (private repo, anonymous `releases.atom` 404).
+
 ## [0.2.0] — 2026-05-03
 
 ### Added

@@ -43,6 +43,7 @@ Cada módulo é um sub-path importável independente:
 | store | `@opensea/satellite-runtime/store` | Persistência tipada (zod schemas) com migrations |
 | log | `@opensea/satellite-runtime/log` | Setup centralizado do electron-log |
 | quit-prompt | `@opensea/satellite-runtime/quit-prompt` | Dialog "fechar ou minimizar" com lembrar |
+| updater | `@opensea/satellite-runtime/updater` | Wrapper electron-updater com retry 24h, periodic 6h, WS cross-check, channel switching |
 
 Helpers de teste em `@opensea/satellite-runtime/testing`.
 

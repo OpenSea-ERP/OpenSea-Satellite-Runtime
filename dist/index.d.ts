@@ -7,4 +7,5 @@ export * from "./graceful-shutdown";
 export * from "./store";
 export * from "./log";
 export * from "./quit-prompt";
+export * from "./updater";
 //# sourceMappingURL=index.d.ts.map
