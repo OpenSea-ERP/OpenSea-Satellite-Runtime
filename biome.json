@@ -45,7 +45,12 @@
       "suspicious": {
         "noExplicitAny": "off",
         "noEmptyBlockStatements": "off",
-        "noArrayIndexKey": "warn"
+        "noArrayIndexKey": "warn",
+        "noConfusingLabels": "warn"
+      },
+      "a11y": {
+        "useKeyWithClickEvents": "off",
+        "noStaticElementInteractions": "off"
       },
       "style": {
         "useImportType": "warn",
