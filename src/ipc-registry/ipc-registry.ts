@@ -3,17 +3,14 @@
  * known channel names + zod payload validation. Bridges to a strongly-typed
  * surface for the renderer.
  */
-import { ipcMain, type IpcMainInvokeEvent } from "electron";
-import log from "electron-log";
-import type { ZodType, z } from "zod";
+import { type IpcMainInvokeEvent, ipcMain } from 'electron';
+import log from 'electron-log';
+import type { ZodType, z } from 'zod';
 
 export interface IpcChannelDefinition<TPayload extends ZodType, TResult> {
   channel: string;
   payloadSchema?: TPayload;
-  handler: (
-    event: IpcMainInvokeEvent,
-    payload: z.infer<TPayload>,
-  ) => TResult | Promise<TResult>;
+  handler: (event: IpcMainInvokeEvent, payload: z.infer<TPayload>) => TResult | Promise<TResult>;
 }
 
 const registered = new Set<string>();
@@ -38,7 +35,7 @@ export function registerIpcChannel<TPayload extends ZodType, TResult>(
         );
         return {
           ok: false,
-          error: "invalid payload",
+          error: 'invalid payload',
           details: parsed.error.message,
         };
       }
@@ -49,7 +46,7 @@ export function registerIpcChannel<TPayload extends ZodType, TResult>(
         log.error(`[satellite-runtime/ipc-registry] ${def.channel} threw:`, err);
         return {
           ok: false,
-          error: err instanceof Error ? err.message : "unknown error",
+          error: err instanceof Error ? err.message : 'unknown error',
         };
       }
     }
@@ -60,7 +57,7 @@ export function registerIpcChannel<TPayload extends ZodType, TResult>(
       log.error(`[satellite-runtime/ipc-registry] ${def.channel} threw:`, err);
       return {
         ok: false,
-        error: err instanceof Error ? err.message : "unknown error",
+        error: err instanceof Error ? err.message : 'unknown error',
       };
     }
   });

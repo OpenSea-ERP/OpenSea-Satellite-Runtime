@@ -1,4 +1,4 @@
 export {
-  setupCrashReporter,
   type SetupCrashReporterOptions,
-} from "./crash-reporter";
+  setupCrashReporter,
+} from './crash-reporter';

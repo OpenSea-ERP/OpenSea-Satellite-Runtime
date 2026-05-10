@@ -1,8 +1,8 @@
 export {
-  setupAutoLaunch,
-  isAutoLaunchEnabled,
-  enableAutoLaunch,
   disableAutoLaunch,
-  toggleAutoLaunch,
+  enableAutoLaunch,
+  isAutoLaunchEnabled,
   type SetupAutoLaunchOptions,
-} from "./auto-launch";
+  setupAutoLaunch,
+  toggleAutoLaunch,
+} from './auto-launch';

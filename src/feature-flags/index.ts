@@ -1,8 +1,8 @@
 export {
-  setupFeatureFlags,
-  stopFeatureFlags,
-  isEnabled,
-  getString,
-  snapshot,
   type FeatureFlagsOptions,
-} from "./feature-flags";
+  getString,
+  isEnabled,
+  setupFeatureFlags,
+  snapshot,
+  stopFeatureFlags,
+} from './feature-flags';

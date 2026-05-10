@@ -1,5 +1,5 @@
-import type { z, ZodType } from "zod";
-import type { SatelliteStore } from "../store/store";
+import type { ZodType, z } from 'zod';
+import type { SatelliteStore } from '../store/store';
 
 /**
  * Subset of `electron-store` methods actually used by runtime modules.

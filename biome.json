@@ -6,13 +6,7 @@
     "useIgnoreFile": true
   },
   "files": {
-    "includes": [
-      "**",
-      "!dist",
-      "!node_modules",
-      "!coverage",
-      "!**/*.cjs"
-    ]
+    "includes": ["**", "!dist", "!node_modules", "!coverage", "!**/*.cjs"]
   },
   "formatter": {
     "enabled": true,

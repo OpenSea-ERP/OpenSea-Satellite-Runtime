@@ -1,57 +1,57 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { logMock } = vi.hoisted(() => ({
   logMock: { warn: vi.fn(), info: vi.fn(), error: vi.fn() },
 }));
-vi.mock("electron-log", () => ({ default: logMock }));
+vi.mock('electron-log', () => ({ default: logMock }));
 
 import {
+  _resetShutdownForTests,
   registerShutdownHandler,
   runShutdownHandlers,
-  _resetShutdownForTests,
-} from "./graceful-shutdown";
+} from './graceful-shutdown';
 
-describe("graceful-shutdown", () => {
+describe('graceful-shutdown', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     _resetShutdownForTests();
   });
 
-  it("runs all registered handlers", async () => {
+  it('runs all registered handlers', async () => {
     const a = vi.fn();
     const b = vi.fn();
-    registerShutdownHandler(a, { name: "a" });
-    registerShutdownHandler(b, { name: "b" });
+    registerShutdownHandler(a, { name: 'a' });
+    registerShutdownHandler(b, { name: 'b' });
     await runShutdownHandlers();
     expect(a).toHaveBeenCalled();
     expect(b).toHaveBeenCalled();
   });
 
-  it("does not throw when handler rejects", async () => {
+  it('does not throw when handler rejects', async () => {
     registerShutdownHandler(
       async () => {
-        throw new Error("boom");
+        throw new Error('boom');
       },
-      { name: "bad" },
+      { name: 'bad' },
     );
     await expect(runShutdownHandlers()).resolves.not.toThrow();
     expect(logMock.error).toHaveBeenCalled();
   });
 
-  it("respects per-handler timeout", async () => {
-    registerShutdownHandler(
-      () => new Promise((resolve) => setTimeout(resolve, 200)),
-      { name: "slow", timeoutMs: 50 },
-    );
+  it('respects per-handler timeout', async () => {
+    registerShutdownHandler(() => new Promise((resolve) => setTimeout(resolve, 200)), {
+      name: 'slow',
+      timeoutMs: 50,
+    });
     const start = Date.now();
     await runShutdownHandlers();
     const elapsed = Date.now() - start;
     expect(elapsed).toBeLessThan(150);
   });
 
-  it("is re-entrant safe (multiple calls coalesce)", async () => {
+  it('is re-entrant safe (multiple calls coalesce)', async () => {
     const handler = vi.fn();
-    registerShutdownHandler(handler, { name: "h" });
+    registerShutdownHandler(handler, { name: 'h' });
     const p1 = runShutdownHandlers();
     const p2 = runShutdownHandlers();
     const p3 = runShutdownHandlers();
@@ -61,7 +61,7 @@ describe("graceful-shutdown", () => {
     expect(handler).toHaveBeenCalledTimes(1);
   });
 
-  it("default timeout is 5000ms", async () => {
+  it('default timeout is 5000ms', async () => {
     let resolved = false;
     registerShutdownHandler(
       () =>
@@ -76,9 +76,9 @@ describe("graceful-shutdown", () => {
     expect(resolved).toBe(true);
   });
 
-  it("handles synchronous handlers", async () => {
+  it('handles synchronous handlers', async () => {
     const sync = vi.fn();
-    registerShutdownHandler(sync, { name: "sync" });
+    registerShutdownHandler(sync, { name: 'sync' });
     await runShutdownHandlers();
     expect(sync).toHaveBeenCalled();
   });

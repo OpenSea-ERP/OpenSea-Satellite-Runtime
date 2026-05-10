@@ -2,4 +2,4 @@ export {
   createSecureStore,
   type SecureStore,
   type SecureStoreOptions,
-} from "./secure-store";
+} from './secure-store';

@@ -1,4 +1,4 @@
-import { BrowserWindow } from "electron";
+import { BrowserWindow } from 'electron';
 
 export interface CreateSplashOptions {
   iconPath: string;
@@ -22,9 +22,7 @@ function htmlFor(appName: string): string {
 </style></head><body><div class="name">${appName}</div><div class="spinner"></div></body></html>`;
 }
 
-export function createSplashWindow(
-  options: CreateSplashOptions,
-): SplashHandle {
+export function createSplashWindow(options: CreateSplashOptions): SplashHandle {
   const win = new BrowserWindow({
     width: options.width ?? 360,
     height: options.height ?? 240,
@@ -39,9 +37,7 @@ export function createSplashWindow(
     webPreferences: { nodeIntegration: false, contextIsolation: true },
   });
 
-  win.loadURL(
-    `data:text/html;charset=utf-8,${encodeURIComponent(htmlFor(options.appName))}`,
-  );
+  win.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(htmlFor(options.appName))}`);
 
   return {
     window: win,

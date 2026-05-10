@@ -1,5 +1,5 @@
 export {
-  createSatelliteTray,
   type CreateSatelliteTrayOptions,
+  createSatelliteTray,
   type SatelliteTrayHandle,
-} from "./tray";
+} from './tray';

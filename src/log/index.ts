@@ -1,1 +1,1 @@
-export { setupLog, getLogger, type SetupLogOptions } from "./log";
+export { getLogger, type SetupLogOptions, setupLog } from './log';

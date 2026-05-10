@@ -1,4 +1,4 @@
-import { EventEmitter } from "node:events";
+import { EventEmitter } from 'node:events';
 
 /**
  * Minimal `BrowserWindow` shape consumed by the runtime modules. Strongly
@@ -9,12 +9,7 @@ export interface MockBrowserWindow {
   bounds: { x: number; y: number; width: number; height: number };
   destroyed: boolean;
   maximized: boolean;
-  setBounds(b: {
-    x?: number;
-    y?: number;
-    width?: number;
-    height?: number;
-  }): void;
+  setBounds(b: { x?: number; y?: number; width?: number; height?: number }): void;
   getBounds(): { x: number; y: number; width: number; height: number };
   isMaximized(): boolean;
   isMinimized(): boolean;
@@ -28,10 +23,7 @@ export interface MockBrowserWindow {
   focus(): void;
   restore(): void;
   on(event: string, handler: (...args: unknown[]) => void): MockBrowserWindow;
-  removeListener(
-    event: string,
-    handler: (...args: unknown[]) => void,
-  ): MockBrowserWindow;
+  removeListener(event: string, handler: (...args: unknown[]) => void): MockBrowserWindow;
   emit(event: string, ...args: unknown[]): boolean;
   webContents: {
     send(channel: string, ...args: unknown[]): void;
@@ -67,7 +59,7 @@ export function mockBrowserWindow(): MockBrowserWindow {
     show() {},
     hide() {},
     close() {
-      emitter.emit("close");
+      emitter.emit('close');
     },
     destroy() {
       win.destroyed = true;

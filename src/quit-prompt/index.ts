@@ -1,1 +1,1 @@
-export { showQuitPrompt, type ShowQuitPromptOptions } from "./quit-prompt";
+export { type ShowQuitPromptOptions, showQuitPrompt } from './quit-prompt';

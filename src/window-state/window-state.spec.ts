@@ -1,15 +1,13 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { memStore, screenMock } = vi.hoisted(() => ({
   memStore: new Map<string, unknown>(),
   screenMock: {
-    getAllDisplays: vi.fn(() => [
-      { bounds: { x: 0, y: 0, width: 1920, height: 1080 } },
-    ]),
+    getAllDisplays: vi.fn(() => [{ bounds: { x: 0, y: 0, width: 1920, height: 1080 } }]),
   },
 }));
 
-vi.mock("electron-store", () => ({
+vi.mock('electron-store', () => ({
   default: vi.fn(() => ({
     get: (k: string) => memStore.get(k),
     set: (k: string, v: unknown) => {
@@ -22,15 +20,12 @@ vi.mock("electron-store", () => ({
   })),
 }));
 
-vi.mock("electron", () => ({
+vi.mock('electron', () => ({
   screen: screenMock,
   app: { isPackaged: true },
 }));
 
-import {
-  restoreWindowState,
-  _resetWindowStateForTests,
-} from "./window-state";
+import { _resetWindowStateForTests, restoreWindowState } from './window-state';
 
 interface MockWin {
   setBounds: ReturnType<typeof vi.fn>;
@@ -55,7 +50,7 @@ function makeWin(): MockWin {
   };
 }
 
-describe("window-state", () => {
+describe('window-state', () => {
   beforeEach(() => {
     memStore.clear();
     vi.clearAllMocks();
@@ -65,9 +60,9 @@ describe("window-state", () => {
     ]);
   });
 
-  it("applies defaults centered when store is empty", () => {
+  it('applies defaults centered when store is empty', () => {
     const win = makeWin();
-    restoreWindowState(win as never, "main", { width: 1280, height: 720 });
+    restoreWindowState(win as never, 'main', { width: 1280, height: 720 });
     expect(win.setBounds).toHaveBeenCalledWith(
       expect.objectContaining({ width: 1280, height: 720 }),
     );
@@ -76,25 +71,25 @@ describe("window-state", () => {
     expect(call.y).toBe(Math.round((1080 - 720) / 2));
   });
 
-  it("persists on resize", () => {
+  it('persists on resize', () => {
     const win = makeWin();
-    restoreWindowState(win as never, "main");
-    win.handlers["resize"]?.();
-    expect(memStore.has("main")).toBe(true);
+    restoreWindowState(win as never, 'main');
+    win.handlers['resize']?.();
+    expect(memStore.has('main')).toBe(true);
   });
 
-  it("registers all expected listeners", () => {
+  it('registers all expected listeners', () => {
     const win = makeWin();
-    restoreWindowState(win as never, "main");
-    expect(win.on).toHaveBeenCalledWith("resize", expect.any(Function));
-    expect(win.on).toHaveBeenCalledWith("move", expect.any(Function));
-    expect(win.on).toHaveBeenCalledWith("maximize", expect.any(Function));
-    expect(win.on).toHaveBeenCalledWith("unmaximize", expect.any(Function));
-    expect(win.on).toHaveBeenCalledWith("close", expect.any(Function));
+    restoreWindowState(win as never, 'main');
+    expect(win.on).toHaveBeenCalledWith('resize', expect.any(Function));
+    expect(win.on).toHaveBeenCalledWith('move', expect.any(Function));
+    expect(win.on).toHaveBeenCalledWith('maximize', expect.any(Function));
+    expect(win.on).toHaveBeenCalledWith('unmaximize', expect.any(Function));
+    expect(win.on).toHaveBeenCalledWith('close', expect.any(Function));
   });
 
-  it("restores maximize state", () => {
-    memStore.set("main", {
+  it('restores maximize state', () => {
+    memStore.set('main', {
       x: 0,
       y: 0,
       width: 800,
@@ -103,12 +98,12 @@ describe("window-state", () => {
       displayBounds: { x: 0, y: 0, width: 1920, height: 1080 },
     });
     const win = makeWin();
-    restoreWindowState(win as never, "main");
+    restoreWindowState(win as never, 'main');
     expect(win.maximize).toHaveBeenCalled();
   });
 
-  it("falls back to defaults when display disconnected", () => {
-    memStore.set("main", {
+  it('falls back to defaults when display disconnected', () => {
+    memStore.set('main', {
       x: 5000,
       y: 5000,
       width: 800,
@@ -117,7 +112,7 @@ describe("window-state", () => {
       displayBounds: { x: 5000, y: 5000, width: 1024, height: 768 },
     });
     const win = makeWin();
-    restoreWindowState(win as never, "main", { width: 1280, height: 720 });
+    restoreWindowState(win as never, 'main', { width: 1280, height: 720 });
     expect(win.setBounds).toHaveBeenCalledWith(
       expect.objectContaining({ width: 1280, height: 720 }),
     );

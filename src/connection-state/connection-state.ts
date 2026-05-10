@@ -4,9 +4,9 @@
  * multiple sources, or listen to WS — satellites combine `ws-client.on('state')`
  * with this broadcaster to keep the renderer in sync.
  */
-import { BrowserWindow } from "electron";
+import { BrowserWindow } from 'electron';
 
-export type ConnectionStatus = "connected" | "connecting" | "disconnected" | "error";
+export type ConnectionStatus = 'connected' | 'connecting' | 'disconnected' | 'error';
 
 export interface ConnectionStatePayload {
   status: ConnectionStatus;
@@ -29,11 +29,10 @@ export interface ConnectionStateBroadcaster {
 export function createConnectionStateBroadcaster(
   options: ConnectionStateOptions = {},
 ): ConnectionStateBroadcaster {
-  const ipcChannel = options.ipcChannel ?? "connection:status";
-  const resolveWindows =
-    options.windows ?? (() => BrowserWindow.getAllWindows());
+  const ipcChannel = options.ipcChannel ?? 'connection:status';
+  const resolveWindows = options.windows ?? (() => BrowserWindow.getAllWindows());
 
-  let current: ConnectionStatePayload = { status: "disconnected" };
+  let current: ConnectionStatePayload = { status: 'disconnected' };
 
   return {
     set(payload) {

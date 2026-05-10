@@ -1,12 +1,12 @@
 export {
-  SatelliteWSClient,
-  createWSClient,
-  type SatelliteWSClientOptions,
-  type WSClientState,
   type AuthMode,
-  type ReconnectOptions,
+  createWSClient,
   type HeartbeatOptions,
-  type ShouldReconnectInfo,
+  type ReconnectOptions,
   type ReleaseEventPayload,
   type RevokedEventPayload,
-} from "./ws-client";
+  SatelliteWSClient,
+  type SatelliteWSClientOptions,
+  type ShouldReconnectInfo,
+  type WSClientState,
+} from './ws-client';

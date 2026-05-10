@@ -1,9 +1,4 @@
-import {
-  Tray,
-  Menu,
-  nativeImage,
-  type MenuItemConstructorOptions,
-} from "electron";
+import { Menu, type MenuItemConstructorOptions, nativeImage, Tray } from 'electron';
 
 export interface CreateSatelliteTrayOptions {
   iconPath: string;
@@ -22,33 +17,29 @@ export interface SatelliteTrayHandle {
   showBalloon(title: string, content: string): void;
 }
 
-export function createSatelliteTray(
-  options: CreateSatelliteTrayOptions,
-): SatelliteTrayHandle {
+export function createSatelliteTray(options: CreateSatelliteTrayOptions): SatelliteTrayHandle {
   const tray = new Tray(nativeImage.createFromPath(options.iconPath));
   const tooltip = options.tooltip ?? options.appName;
   tray.setToolTip(tooltip);
 
-  function buildMenu(
-    custom: MenuItemConstructorOptions[] = [],
-  ): MenuItemConstructorOptions[] {
+  function buildMenu(custom: MenuItemConstructorOptions[] = []): MenuItemConstructorOptions[] {
     const items: MenuItemConstructorOptions[] = [];
     items.push(...custom);
-    if (custom.length > 0) items.push({ type: "separator" });
+    if (custom.length > 0) items.push({ type: 'separator' });
     items.push({
       label: `Mostrar ${options.appName}`,
       click: () => options.onShow?.(),
     });
-    items.push({ type: "separator" });
+    items.push({ type: 'separator' });
     items.push({
-      label: "Sair",
+      label: 'Sair',
       click: () => options.onQuit?.(),
     });
     return items;
   }
 
   tray.setContextMenu(Menu.buildFromTemplate(buildMenu(options.customMenuItems)));
-  tray.on("double-click", () => options.onShow?.());
+  tray.on('double-click', () => options.onShow?.());
 
   return {
     tray,

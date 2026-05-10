@@ -1,4 +1,4 @@
-import type { SatelliteTrayHandle } from "../tray/tray";
+import type { SatelliteTrayHandle } from '../tray/tray';
 
 interface MockTrayCalls {
   destroy: number;

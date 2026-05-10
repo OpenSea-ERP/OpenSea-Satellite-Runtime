@@ -1,5 +1,5 @@
-import { screen, type BrowserWindow, type Rectangle } from "electron";
-import ElectronStore from "electron-store";
+import { type BrowserWindow, type Rectangle, screen } from 'electron';
+import ElectronStore from 'electron-store';
 
 interface WindowStatePayload {
   x: number;
@@ -10,18 +10,15 @@ interface WindowStatePayload {
   displayBounds: Rectangle;
 }
 
-const stores = new Map<
-  string,
-  ElectronStore<Record<string, WindowStatePayload>>
->();
+const stores = new Map<string, ElectronStore<Record<string, WindowStatePayload>>>();
 
 function getStore(): ElectronStore<Record<string, WindowStatePayload>> {
-  let s = stores.get("windowState.values");
+  let s = stores.get('windowState.values');
   if (!s) {
     s = new ElectronStore<Record<string, WindowStatePayload>>({
-      name: "windowState.values",
+      name: 'windowState.values',
     });
-    stores.set("windowState.values", s);
+    stores.set('windowState.values', s);
   }
   return s;
 }
@@ -100,11 +97,11 @@ export function restoreWindowState(
     });
   };
 
-  win.on("resize", persist);
-  win.on("move", persist);
-  win.on("maximize", persist);
-  win.on("unmaximize", persist);
-  win.on("close", persist);
+  win.on('resize', persist);
+  win.on('move', persist);
+  win.on('maximize', persist);
+  win.on('unmaximize', persist);
+  win.on('close', persist);
 }
 
 /** @internal — for tests */

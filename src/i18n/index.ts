@@ -1,9 +1,9 @@
 export {
-  setDefaultLocale,
-  getDefaultLocale,
-  formatDate,
-  formatTime,
-  formatNumber,
   formatCurrency,
+  formatDate,
+  formatNumber,
   formatRelativeTime,
-} from "./i18n";
+  formatTime,
+  getDefaultLocale,
+  setDefaultLocale,
+} from './i18n';

@@ -1,5 +1,5 @@
 export {
-  registerIpcChannel,
   getRegisteredChannels,
   type IpcChannelDefinition,
-} from "./ipc-registry";
+  registerIpcChannel,
+} from './ipc-registry';

@@ -7,7 +7,7 @@
  * The runtime only renders + dispatches; satellite is responsible for
  * tearing down state (clearing keytar, navigating to /pair) in `onAck`.
  */
-import * as React from "react";
+import type * as React from 'react';
 
 export interface RevokedDialogProps {
   open: boolean;
@@ -23,24 +23,24 @@ export interface RevokedDialogProps {
 }
 
 const overlayStyle: React.CSSProperties = {
-  position: "fixed",
+  position: 'fixed',
   inset: 0,
-  background: "rgba(15, 23, 42, 0.85)",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
+  background: 'rgba(15, 23, 42, 0.85)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
   zIndex: 9999,
-  fontFamily: "system-ui, -apple-system, sans-serif",
+  fontFamily: 'system-ui, -apple-system, sans-serif',
 };
 
 const cardStyle: React.CSSProperties = {
-  background: "#fff",
-  color: "#0f172a",
+  background: '#fff',
+  color: '#0f172a',
   borderRadius: 12,
   padding: 32,
   maxWidth: 480,
-  width: "calc(100% - 48px)",
-  boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.4)",
+  width: 'calc(100% - 48px)',
+  boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.4)',
 };
 
 const titleStyle: React.CSSProperties = {
@@ -53,19 +53,19 @@ const messageStyle: React.CSSProperties = {
   fontSize: 14,
   lineHeight: 1.5,
   marginBottom: 24,
-  color: "#475569",
+  color: '#475569',
 };
 
 const buttonStyle: React.CSSProperties = {
-  background: "#dc2626",
-  color: "#fff",
-  border: "none",
+  background: '#dc2626',
+  color: '#fff',
+  border: 'none',
   borderRadius: 8,
-  padding: "10px 20px",
+  padding: '10px 20px',
   fontSize: 14,
   fontWeight: 600,
-  cursor: "pointer",
-  width: "100%",
+  cursor: 'pointer',
+  width: '100%',
 };
 
 export function RevokedDialog({
@@ -74,17 +74,16 @@ export function RevokedDialog({
   appName,
   onAck,
   className,
-  ackLabel = "Voltar ao pareamento",
-  title = "Pareamento revogado",
+  ackLabel = 'Voltar ao pareamento',
+  title = 'Pareamento revogado',
   message,
 }: RevokedDialogProps): React.ReactElement | null {
   if (!open) return null;
   const defaultMessage = (
     <>
-      O pareamento deste dispositivo com o {appName} foi revogado pelo
-      administrador
-      {reason ? ` (motivo: ${reason})` : ""}. Para continuar usando o app, é
-      preciso reaprovar o dispositivo no painel administrativo.
+      O pareamento deste dispositivo com o {appName} foi revogado pelo administrador
+      {reason ? ` (motivo: ${reason})` : ''}. Para continuar usando o app, é preciso reaprovar o
+      dispositivo no painel administrativo.
     </>
   );
   return (

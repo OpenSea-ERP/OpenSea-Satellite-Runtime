@@ -6,10 +6,11 @@
  *
  * Returns the absolute path of the written file.
  */
-import path from "node:path";
-import fs from "node:fs/promises";
-import { app } from "electron";
-import log from "electron-log";
+
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { app } from 'electron';
+import log from 'electron-log';
 
 export interface ExportLogsOptions {
   /** Optional override for the source dir. Default `app.getPath('logs')`. */
@@ -23,23 +24,21 @@ export interface ExportLogsOptions {
   filter?: (filename: string) => boolean;
 }
 
-export async function exportLogs(
-  options: ExportLogsOptions = {},
-): Promise<string> {
-  const sourceDir = options.sourceDir ?? app.getPath("logs");
+export async function exportLogs(options: ExportLogsOptions = {}): Promise<string> {
+  const sourceDir = options.sourceDir ?? app.getPath('logs');
   const targetPath =
     options.targetPath ??
     path.join(
-      app.getPath("userData"),
-      `exported-logs-${new Date().toISOString().replace(/[:.]/g, "-")}.txt`,
+      app.getPath('userData'),
+      `exported-logs-${new Date().toISOString().replace(/[:.]/g, '-')}.txt`,
     );
-  const filter = options.filter ?? ((f: string) => f.endsWith(".log"));
+  const filter = options.filter ?? ((f: string) => f.endsWith('.log'));
 
   let entries: string[];
   try {
     entries = await fs.readdir(sourceDir);
   } catch (err) {
-    log.error("[satellite-runtime/export-logs] readdir failed:", err);
+    log.error('[satellite-runtime/export-logs] readdir failed:', err);
     throw err;
   }
 
@@ -52,16 +51,14 @@ export async function exportLogs(
     const fullPath = path.join(sourceDir, file);
     sections.push(`\n\n===== ${file} =====\n`);
     try {
-      const content = await fs.readFile(fullPath, "utf-8");
+      const content = await fs.readFile(fullPath, 'utf-8');
       sections.push(content);
     } catch (err) {
       sections.push(`[failed to read: ${(err as Error).message}]`);
     }
   }
 
-  await fs.writeFile(targetPath, sections.join(""), "utf-8");
-  log.info(
-    `[satellite-runtime/export-logs] wrote ${files.length} files → ${targetPath}`,
-  );
+  await fs.writeFile(targetPath, sections.join(''), 'utf-8');
+  log.info(`[satellite-runtime/export-logs] wrote ${files.length} files → ${targetPath}`);
   return targetPath;
 }

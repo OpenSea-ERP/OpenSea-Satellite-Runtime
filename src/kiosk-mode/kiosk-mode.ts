@@ -5,7 +5,7 @@
  *
  * Apply BEFORE the window loads its content.
  */
-import { Menu, type BrowserWindow } from "electron";
+import { type BrowserWindow, Menu } from 'electron';
 
 export interface KioskOptions {
   /** Disable Ctrl/Cmd-shortcut zoom. Default true. */
@@ -16,10 +16,7 @@ export interface KioskOptions {
   disableAppMenu?: boolean;
 }
 
-export function enterKioskMode(
-  win: BrowserWindow,
-  options: KioskOptions = {},
-): void {
+export function enterKioskMode(win: BrowserWindow, options: KioskOptions = {}): void {
   const disableZoom = options.disableZoom ?? true;
   const disableDevTools = options.disableDevTools ?? true;
   const disableAppMenu = options.disableAppMenu ?? true;
@@ -36,9 +33,9 @@ export function enterKioskMode(
     const wc = win.webContents;
     wc.setZoomFactor(1);
     wc.setVisualZoomLevelLimits(1, 1);
-    wc.on("before-input-event", (event, input) => {
+    wc.on('before-input-event', (event, input) => {
       const ctrl = input.control || input.meta;
-      if (ctrl && ["+", "-", "=", "0"].includes(input.key)) {
+      if (ctrl && ['+', '-', '=', '0'].includes(input.key)) {
         event.preventDefault();
       }
     });
@@ -46,11 +43,11 @@ export function enterKioskMode(
 
   if (disableDevTools) {
     const wc = win.webContents;
-    wc.on("before-input-event", (event, input) => {
+    wc.on('before-input-event', (event, input) => {
       const ctrl = input.control || input.meta;
       const shift = input.shift;
-      if (input.key === "F12") event.preventDefault();
-      if (ctrl && shift && (input.key === "I" || input.key === "i")) {
+      if (input.key === 'F12') event.preventDefault();
+      if (ctrl && shift && (input.key === 'I' || input.key === 'i')) {
         event.preventDefault();
       }
     });

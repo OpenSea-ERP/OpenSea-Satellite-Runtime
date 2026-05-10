@@ -1,1 +1,1 @@
-export { registerDeepLink, type DeepLinkOptions } from "./deep-link";
+export { type DeepLinkOptions, registerDeepLink } from './deep-link';

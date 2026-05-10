@@ -1,1 +1,1 @@
-export { enterKioskMode, exitKioskMode, type KioskOptions } from "./kiosk-mode";
+export { enterKioskMode, exitKioskMode, type KioskOptions } from './kiosk-mode';

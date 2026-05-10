@@ -1,7 +1,7 @@
 export {
-  createConnectionStateBroadcaster,
-  type ConnectionStatus,
-  type ConnectionStatePayload,
-  type ConnectionStateOptions,
   type ConnectionStateBroadcaster,
-} from "./connection-state";
+  type ConnectionStateOptions,
+  type ConnectionStatePayload,
+  type ConnectionStatus,
+  createConnectionStateBroadcaster,
+} from './connection-state';

@@ -1,5 +1,5 @@
 export {
-  createSplashWindow,
   type CreateSplashOptions,
+  createSplashWindow,
   type SplashHandle,
-} from "./splash";
+} from './splash';

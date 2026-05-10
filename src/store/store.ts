@@ -1,7 +1,7 @@
-import ElectronStore from "electron-store";
-import fs from "node:fs";
-import log from "electron-log";
-import type { z, ZodType } from "zod";
+import fs from 'node:fs';
+import log from 'electron-log';
+import ElectronStore from 'electron-store';
+import type { ZodType, z } from 'zod';
 
 export interface CreateStoreOptions<S extends ZodType> {
   name: string;
@@ -12,18 +12,13 @@ export interface CreateStoreOptions<S extends ZodType> {
    * electron-store instance and may mutate it directly (set/delete) — same
    * shape as electron-store's native migrations API.
    */
-  migrations?: Record<
-    string,
-    (
-      s: ElectronStore<Record<string, unknown>>,
-    ) => void | Promise<void>
-  >;
+  migrations?: Record<string, (s: ElectronStore<Record<string, unknown>>) => void | Promise<void>>;
   /**
    * What to do when the on-disk JSON is corrupt or fails schema parse.
    * - `reset` (default): unlink the file and recreate with defaults.
    * - `throw`: rethrow so the satellite can decide.
    */
-  onCorruption?: "throw" | "reset";
+  onCorruption?: 'throw' | 'reset';
 }
 
 export interface SatelliteStore<S extends ZodType> {
@@ -47,12 +42,9 @@ function recoverFromCorruption(
   options: CreateStoreOptions<ZodType>,
   err: unknown,
 ): ElectronStore<Record<string, unknown>> {
-  const onCorruption = options.onCorruption ?? "reset";
-  if (onCorruption === "throw") throw err;
-  log.error(
-    `[satellite-runtime/store:${options.name}] corrupted store, resetting`,
-    err,
-  );
+  const onCorruption = options.onCorruption ?? 'reset';
+  if (onCorruption === 'throw') throw err;
+  log.error(`[satellite-runtime/store:${options.name}] corrupted store, resetting`, err);
   const errPath = (err as { path?: string }).path;
   if (errPath && fs.existsSync(errPath)) {
     try {
@@ -70,9 +62,7 @@ function recoverFromCorruption(
   });
 }
 
-export function createStore<S extends ZodType>(
-  options: CreateStoreOptions<S>,
-): SatelliteStore<S> {
+export function createStore<S extends ZodType>(options: CreateStoreOptions<S>): SatelliteStore<S> {
   // Validate the supplied defaults up front — a typo in the consumer's
   // defaults object should fail loudly here, not at first read in prod.
   const defaultsParse = options.schema.safeParse(options.defaults);
@@ -98,7 +88,7 @@ export function createStore<S extends ZodType>(
     );
     electronStore = recoverFromCorruption(
       options,
-      Object.assign(new Error("schema validation failed"), {
+      Object.assign(new Error('schema validation failed'), {
         path: (electronStore as unknown as { path?: string }).path,
       }),
     );
@@ -128,9 +118,7 @@ export function createStore<S extends ZodType>(
     },
     reset() {
       electronStore.clear();
-      for (const [k, v] of Object.entries(
-        options.defaults as Record<string, unknown>,
-      )) {
+      for (const [k, v] of Object.entries(options.defaults as Record<string, unknown>)) {
         electronStore.set(k, v);
       }
     },

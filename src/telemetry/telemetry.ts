@@ -7,8 +7,8 @@
  * Satellites must explicitly opt-in via `setupTelemetry({ ..., enabled: true })`.
  * Default `enabled: false` — privacy-first.
  */
-import { app } from "electron";
-import log from "electron-log";
+import { app } from 'electron';
+import log from 'electron-log';
 
 export interface TelemetryPayload {
   device_id: string;
@@ -49,7 +49,7 @@ function buildPayload(opts: SetupTelemetryOptions): TelemetryPayload | null {
     device_id: id,
     app_name: opts.appName,
     app_version: app.getVersion(),
-    os: process.platform === "win32" ? "Windows" : process.platform,
+    os: process.platform === 'win32' ? 'Windows' : process.platform,
     platform: process.platform,
     locale: app.getLocale(),
     last_seen: new Date().toISOString(),
@@ -60,47 +60,43 @@ function buildPayload(opts: SetupTelemetryOptions): TelemetryPayload | null {
 async function sendPing(opts: SetupTelemetryOptions): Promise<void> {
   const payload = buildPayload(opts);
   if (!payload) {
-    log.debug("[satellite-runtime/telemetry] no deviceId yet; skipping ping");
+    log.debug('[satellite-runtime/telemetry] no deviceId yet; skipping ping');
     return;
   }
   try {
     const fetcher = opts.fetchImpl ?? globalThis.fetch;
     if (!fetcher) {
-      log.warn(
-        "[satellite-runtime/telemetry] no fetch impl available; skipping ping",
-      );
+      log.warn('[satellite-runtime/telemetry] no fetch impl available; skipping ping');
       return;
     }
     const res = await fetcher(opts.endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
     if (!res.ok) {
-      log.warn(
-        `[satellite-runtime/telemetry] ping responded ${res.status}`,
-      );
+      log.warn(`[satellite-runtime/telemetry] ping responded ${res.status}`);
     }
   } catch (err) {
-    log.warn("[satellite-runtime/telemetry] ping failed:", err);
+    log.warn('[satellite-runtime/telemetry] ping failed:', err);
   }
 }
 
 export function setupTelemetry(options: SetupTelemetryOptions): void {
   if (initialized) {
-    log.warn("[satellite-runtime/telemetry] already initialized; ignoring");
+    log.warn('[satellite-runtime/telemetry] already initialized; ignoring');
     return;
   }
   initialized = true;
   if (!options.enabled) {
-    log.info("[satellite-runtime/telemetry] disabled (no opt-in)");
+    log.info('[satellite-runtime/telemetry] disabled (no opt-in)');
     return;
   }
   void sendPing(options);
   pingTimer = setInterval(() => {
     void sendPing(options);
   }, options.intervalMs ?? DAY_MS);
-  log.info("[satellite-runtime/telemetry] enabled");
+  log.info('[satellite-runtime/telemetry] enabled');
 }
 
 export function stopTelemetry(): void {

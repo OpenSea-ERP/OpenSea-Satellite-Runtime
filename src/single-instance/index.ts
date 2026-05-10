@@ -1,4 +1,4 @@
 export {
-  ensureSingleInstance,
   type EnsureSingleInstanceOptions,
-} from "./single-instance";
+  ensureSingleInstance,
+} from './single-instance';

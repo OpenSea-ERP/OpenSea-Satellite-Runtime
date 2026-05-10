@@ -1,4 +1,4 @@
-import log from "electron-log";
+import log from 'electron-log';
 
 export interface ShutdownHandlerOptions {
   name?: string;
@@ -51,10 +51,7 @@ async function runWithTimeout(h: RegisteredHandler): Promise<void> {
         if (!settled) {
           settled = true;
           clearTimeout(timer);
-          log.error(
-            `[satellite-runtime/shutdown] handler "${h.name}" failed:`,
-            err,
-          );
+          log.error(`[satellite-runtime/shutdown] handler "${h.name}" failed:`, err);
           resolve();
         }
       });
@@ -68,11 +65,9 @@ async function runWithTimeout(h: RegisteredHandler): Promise<void> {
 export function runShutdownHandlers(): Promise<void> {
   if (shutdownPromise) return shutdownPromise;
   shutdownPromise = (async () => {
-    log.info(
-      `[satellite-runtime/shutdown] running ${handlers.length} handlers`,
-    );
+    log.info(`[satellite-runtime/shutdown] running ${handlers.length} handlers`);
     await Promise.all(handlers.map(runWithTimeout));
-    log.info("[satellite-runtime/shutdown] all handlers completed");
+    log.info('[satellite-runtime/shutdown] all handlers completed');
   })();
   return shutdownPromise;
 }

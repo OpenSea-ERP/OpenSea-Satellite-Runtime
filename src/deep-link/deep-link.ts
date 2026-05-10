@@ -7,8 +7,8 @@
  *
  * Call from main process during boot.
  */
-import { app } from "electron";
-import log from "electron-log";
+import { app } from 'electron';
+import log from 'electron-log';
 
 export interface DeepLinkOptions {
   protocol: string; // e.g. 'opensea'
@@ -20,54 +20,44 @@ export function registerDeepLink(options: DeepLinkOptions): void {
 
   if (process.defaultApp) {
     if (process.argv.length >= 2) {
-      app.setAsDefaultProtocolClient(protocol, process.execPath, [
-        process.argv[1] as string,
-      ]);
+      app.setAsDefaultProtocolClient(protocol, process.execPath, [process.argv[1] as string]);
     }
   } else {
     app.setAsDefaultProtocolClient(protocol);
   }
 
   // macOS: open-url
-  app.on("open-url", (event, url) => {
+  app.on('open-url', (event, url) => {
     event.preventDefault();
-    log.info(
-      `[satellite-runtime/deep-link] open-url received: ${url.slice(0, 100)}`,
-    );
+    log.info(`[satellite-runtime/deep-link] open-url received: ${url.slice(0, 100)}`);
     try {
       onUrl(url);
     } catch (err) {
-      log.error("[satellite-runtime/deep-link] onUrl threw:", err);
+      log.error('[satellite-runtime/deep-link] onUrl threw:', err);
     }
   });
 
   // Windows/Linux: second-instance carries the URL in argv
-  app.on("second-instance", (_event, argv) => {
+  app.on('second-instance', (_event, argv) => {
     const url = argv.find((arg) => arg.startsWith(`${protocol}://`));
     if (url) {
-      log.info(
-        `[satellite-runtime/deep-link] second-instance URL received: ${url.slice(0, 100)}`,
-      );
+      log.info(`[satellite-runtime/deep-link] second-instance URL received: ${url.slice(0, 100)}`);
       try {
         onUrl(url);
       } catch (err) {
-        log.error("[satellite-runtime/deep-link] onUrl threw:", err);
+        log.error('[satellite-runtime/deep-link] onUrl threw:', err);
       }
     }
   });
 
   // First-launch URL (Windows): protocol activation passes URL in argv.
-  const initialUrl = process.argv.find((arg) =>
-    arg.startsWith(`${protocol}://`),
-  );
+  const initialUrl = process.argv.find((arg) => arg.startsWith(`${protocol}://`));
   if (initialUrl) {
-    log.info(
-      `[satellite-runtime/deep-link] initial URL: ${initialUrl.slice(0, 100)}`,
-    );
+    log.info(`[satellite-runtime/deep-link] initial URL: ${initialUrl.slice(0, 100)}`);
     try {
       onUrl(initialUrl);
     } catch (err) {
-      log.error("[satellite-runtime/deep-link] onUrl threw on initial:", err);
+      log.error('[satellite-runtime/deep-link] onUrl threw on initial:', err);
     }
   }
 }

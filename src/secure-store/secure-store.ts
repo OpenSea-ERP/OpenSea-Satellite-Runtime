@@ -5,8 +5,9 @@
  * Playwright suites do not pollute the OS Credential Manager / Keychain
  * across runs (Emporion gold standard).
  */
-import keytar from "keytar";
-import log from "electron-log";
+
+import log from 'electron-log';
+import keytar from 'keytar';
 
 export interface SecureStoreOptions {
   /** Service name used as the keytar service namespace. */
@@ -25,7 +26,7 @@ export interface SecureStore {
 }
 
 export function createSecureStore(options: SecureStoreOptions): SecureStore {
-  const isTestMode = options.testMode ?? process.env.NODE_ENV === "test";
+  const isTestMode = options.testMode ?? process.env.NODE_ENV === 'test';
   const memory = new Map<string, string>();
   const logger = log.scope(`secure-store:${options.service}`);
 

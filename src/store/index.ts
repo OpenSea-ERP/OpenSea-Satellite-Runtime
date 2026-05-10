@@ -1,5 +1,5 @@
 export {
-  createStore,
   type CreateStoreOptions,
+  createStore,
   type SatelliteStore,
-} from "./store";
+} from './store';

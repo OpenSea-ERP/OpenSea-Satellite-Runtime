@@ -1,6 +1,6 @@
 export {
+  type SetupTelemetryOptions,
   setupTelemetry,
   stopTelemetry,
   type TelemetryPayload,
-  type SetupTelemetryOptions,
-} from "./telemetry";
+} from './telemetry';

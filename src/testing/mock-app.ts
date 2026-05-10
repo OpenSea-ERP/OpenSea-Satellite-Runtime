@@ -1,4 +1,4 @@
-import { EventEmitter } from "node:events";
+import { EventEmitter } from 'node:events';
 
 /**
  * Minimal `Electron.App` shape consumed by the runtime modules.
@@ -10,10 +10,7 @@ export interface MockApp {
   quit(): void;
   exit(code?: number): void;
   on(event: string, handler: (...args: unknown[]) => void): MockApp;
-  removeListener(
-    event: string,
-    handler: (...args: unknown[]) => void,
-  ): MockApp;
+  removeListener(event: string, handler: (...args: unknown[]) => void): MockApp;
   emit(event: string, ...args: unknown[]): boolean;
   whenReady(): Promise<void>;
 }
@@ -31,10 +28,10 @@ export function mockApp(overrides: MockAppOverrides = {}): MockApp {
       return overrides.lockWillBeAcquired ?? true;
     },
     quit() {
-      emitter.emit("quit");
+      emitter.emit('quit');
     },
     exit(_code = 0) {
-      emitter.emit("exit", _code);
+      emitter.emit('exit', _code);
     },
     on(event, handler) {
       emitter.on(event, handler);

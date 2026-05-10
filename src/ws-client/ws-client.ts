@@ -10,31 +10,28 @@
  * transport-only. See spec C-A1..C-A8 in
  * `docs/superpowers/specs/2026-05-03-satellite-runtime-connection-design.md`.
  */
-import { EventEmitter } from "node:events";
-import WebSocket from "ws";
-import log from "electron-log";
-import {
-  fromWireSatelliteKind,
-  type SatelliteKind,
-} from "@opensea/satellite-contract";
+import { EventEmitter } from 'node:events';
+import { fromWireSatelliteKind, type SatelliteKind } from '@opensea/satellite-contract';
+import log from 'electron-log';
+import WebSocket from 'ws';
 
 // ── Public types ───────────────────────────────────────────────────────────
 export type WSClientState =
-  | "idle"
-  | "waiting-auth"
-  | "connecting"
-  | "connected"
-  | "reconnecting"
-  | "error"
-  | "closed";
+  | 'idle'
+  | 'waiting-auth'
+  | 'connecting'
+  | 'connected'
+  | 'reconnecting'
+  | 'error'
+  | 'closed';
 
 export type AuthMode<TOut> =
   | {
-      kind: "bearer-header";
+      kind: 'bearer-header';
       token: () => string | null | undefined | Promise<string | null | undefined>;
     }
   | {
-      kind: "hello-message";
+      kind: 'hello-message';
       token: () => string | null | undefined | Promise<string | null | undefined>;
       buildHelloMessages: (token: string) => TOut[] | Promise<TOut[]>;
     };
@@ -55,7 +52,7 @@ export interface HeartbeatOptions<TOut> {
 export interface ShouldReconnectInfo {
   closeCode?: number;
   error?: Error;
-  phase: "open" | "close" | "error" | "heartbeat";
+  phase: 'open' | 'close' | 'error' | 'heartbeat';
 }
 
 export interface SatelliteWSClientOptions<TIn = unknown, TOut = unknown> {
@@ -116,11 +113,8 @@ function defaultShouldReconnect(info: ShouldReconnectInfo): boolean {
 
 // ── Implementation ─────────────────────────────────────────────────────────
 
-export class SatelliteWSClient<
-  TIn = unknown,
-  TOut = unknown,
-> extends EventEmitter {
-  private state: WSClientState = "idle";
+export class SatelliteWSClient<TIn = unknown, TOut = unknown> extends EventEmitter {
+  private state: WSClientState = 'idle';
   private socket: WebSocket | null = null;
   private generation = 0;
   private reconnectAttempts = 0;
@@ -141,10 +135,9 @@ export class SatelliteWSClient<
     this.reconnectCfg = { ...DEFAULT_RECONNECT, ...(options.reconnect ?? {}) };
     this.heartbeatCfg = {
       intervalMs: options.heartbeat?.intervalMs ?? DEFAULT_HEARTBEAT.intervalMs,
-      pongTimeoutMs:
-        options.heartbeat?.pongTimeoutMs ?? DEFAULT_HEARTBEAT.pongTimeoutMs,
+      pongTimeoutMs: options.heartbeat?.pongTimeoutMs ?? DEFAULT_HEARTBEAT.pongTimeoutMs,
     };
-    this.logger = log.scope(options.logScope ?? "satellite-runtime/ws") as never;
+    this.logger = log.scope(options.logScope ?? 'satellite-runtime/ws') as never;
     this.WS = options.WebSocketImpl ?? WebSocket;
     this.jitter = options.jitterFn ?? Math.random;
   }
@@ -154,7 +147,7 @@ export class SatelliteWSClient<
   }
 
   isConnected(): boolean {
-    return this.state === "connected";
+    return this.state === 'connected';
   }
 
   getReconnectAttempts(): number {
@@ -168,13 +161,13 @@ export class SatelliteWSClient<
    */
   connect(): void {
     if (this.destroyed) {
-      this.logger.warn("connect() called after destroy(); ignored");
+      this.logger.warn('connect() called after destroy(); ignored');
       return;
     }
     if (
-      this.state === "connecting" ||
-      this.state === "connected" ||
-      this.state === "reconnecting"
+      this.state === 'connecting' ||
+      this.state === 'connected' ||
+      this.state === 'reconnecting'
     ) {
       this.logger.warn(`connect() called in state=${this.state}; ignored`);
       return;
@@ -188,13 +181,13 @@ export class SatelliteWSClient<
     this.cleanupHeartbeat();
     if (this.socket) {
       try {
-        this.socket.close(1000, "client disconnect");
+        this.socket.close(1000, 'client disconnect');
       } catch (err) {
-        this.logger.warn("error during socket.close():", err);
+        this.logger.warn('error during socket.close():', err);
       }
       this.socket = null;
     }
-    this.setState("closed");
+    this.setState('closed');
   }
 
   /** Permanent teardown. Idempotent. */
@@ -209,13 +202,13 @@ export class SatelliteWSClient<
     if (this.socket) {
       try {
         this.removeSocketListeners(this.socket);
-        this.socket.close(1000, "destroy");
+        this.socket.close(1000, 'destroy');
       } catch {
         /* ignore */
       }
       this.socket = null;
     }
-    this.setState("closed");
+    this.setState('closed');
     this.removeAllListeners();
   }
 
@@ -224,7 +217,7 @@ export class SatelliteWSClient<
    * false if the client is not connected or the socket rejected the send.
    */
   send(message: TOut): boolean {
-    if (this.state !== "connected" || !this.socket) {
+    if (this.state !== 'connected' || !this.socket) {
       this.logger.warn(`send() called in state=${this.state}; dropping`);
       return false;
     }
@@ -232,7 +225,7 @@ export class SatelliteWSClient<
       this.socket.send(JSON.stringify(message));
       return true;
     } catch (err) {
-      this.logger.error("send() failed:", err);
+      this.logger.error('send() failed:', err);
       return false;
     }
   }
@@ -242,18 +235,18 @@ export class SatelliteWSClient<
   private setState(next: WSClientState): void {
     if (this.state === next) return;
     this.state = next;
-    this.emit("state", next);
+    this.emit('state', next);
   }
 
   private async openSocket(): Promise<void> {
     const myGeneration = ++this.generation;
-    this.setState("connecting");
+    this.setState('connecting');
 
     let token: string | null | undefined;
     try {
       token = await this.opts.auth.token();
     } catch (err) {
-      this.logger.error("auth.token() threw:", err);
+      this.logger.error('auth.token() threw:', err);
       this.handleAuthFailure(myGeneration);
       return;
     }
@@ -264,8 +257,8 @@ export class SatelliteWSClient<
     if (this.destroyed || myGeneration !== this.generation) return;
 
     if (!token) {
-      this.logger.info("no auth token; entering waiting-auth state");
-      this.setState("waiting-auth");
+      this.logger.info('no auth token; entering waiting-auth state');
+      this.setState('waiting-auth');
       return;
     }
 
@@ -273,13 +266,13 @@ export class SatelliteWSClient<
     let socket: WebSocket;
     try {
       const wsOptions =
-        this.opts.auth.kind === "bearer-header"
+        this.opts.auth.kind === 'bearer-header'
           ? { headers: { Authorization: `Bearer ${token}` } }
           : undefined;
       socket = new this.WS(url, wsOptions);
     } catch (err) {
-      this.logger.error("WebSocket construction failed:", err);
-      this.handleErrorPath(err as Error, myGeneration, "open");
+      this.logger.error('WebSocket construction failed:', err);
+      this.handleErrorPath(err as Error, myGeneration, 'open');
       return;
     }
 
@@ -295,26 +288,20 @@ export class SatelliteWSClient<
     this.attachSocketListeners(socket, myGeneration, token);
   }
 
-  private attachSocketListeners(
-    socket: WebSocket,
-    myGeneration: number,
-    token: string,
-  ): void {
+  private attachSocketListeners(socket: WebSocket, myGeneration: number, token: string): void {
     const onOpen = (): void => {
       if (myGeneration !== this.generation) return;
       this.reconnectAttempts = 0;
-      this.setState("connected");
-      this.emit("open");
+      this.setState('connected');
+      this.emit('open');
       this.startHeartbeat(myGeneration);
       // Hello messages auth: send after open.
-      if (this.opts.auth.kind === "hello-message") {
+      if (this.opts.auth.kind === 'hello-message') {
         void Promise.resolve(this.opts.auth.buildHelloMessages(token))
           .then((msgs) => {
             for (const msg of msgs) this.send(msg);
           })
-          .catch((err) =>
-            this.logger.error("hello messages build failed:", err),
-          );
+          .catch((err) => this.logger.error('hello messages build failed:', err));
       }
     };
 
@@ -328,15 +315,15 @@ export class SatelliteWSClient<
       this.logger.info(`socket close: code=${code} reason=${reason.toString()}`);
       this.cleanupHeartbeat();
       this.socket = null;
-      this.handleErrorPath(undefined, myGeneration, "close", code);
+      this.handleErrorPath(undefined, myGeneration, 'close', code);
     };
 
     const onError = (err: Error): void => {
       if (myGeneration !== this.generation) return;
-      this.logger.error("socket error:", err);
+      this.logger.error('socket error:', err);
       this.cleanupHeartbeat();
-      this.emit("error", err);
-      this.handleErrorPath(err, myGeneration, "error");
+      this.emit('error', err);
+      this.handleErrorPath(err, myGeneration, 'error');
     };
 
     const onPong = (): void => {
@@ -347,19 +334,19 @@ export class SatelliteWSClient<
       }
     };
 
-    socket.on("open", onOpen);
-    socket.on("message", onMessage);
-    socket.on("close", onClose);
-    socket.on("error", onError);
-    socket.on("pong", onPong);
+    socket.on('open', onOpen);
+    socket.on('message', onMessage);
+    socket.on('close', onClose);
+    socket.on('error', onError);
+    socket.on('pong', onPong);
   }
 
   private removeSocketListeners(socket: WebSocket): void {
-    socket.removeAllListeners("open");
-    socket.removeAllListeners("message");
-    socket.removeAllListeners("close");
-    socket.removeAllListeners("error");
-    socket.removeAllListeners("pong");
+    socket.removeAllListeners('open');
+    socket.removeAllListeners('message');
+    socket.removeAllListeners('close');
+    socket.removeAllListeners('error');
+    socket.removeAllListeners('pong');
   }
 
   private dispatchIncoming(raw: WebSocket.RawData): void {
@@ -367,10 +354,10 @@ export class SatelliteWSClient<
     try {
       parsed = JSON.parse(raw.toString());
     } catch (err) {
-      this.logger.warn("incoming message JSON parse failed:", err);
+      this.logger.warn('incoming message JSON parse failed:', err);
       return;
     }
-    this.emit("message", parsed);
+    this.emit('message', parsed);
 
     const routeShared = this.opts.routeShared !== false;
     if (routeShared && this.tryRouteShared(parsed)) return;
@@ -378,27 +365,27 @@ export class SatelliteWSClient<
     if (this.opts.validateIncoming) {
       const validated = this.opts.validateIncoming(parsed);
       if (validated === null) {
-        this.logger.debug("incoming dropped by validator:", parsed);
+        this.logger.debug('incoming dropped by validator:', parsed);
         return;
       }
       try {
         this.opts.onDomainMessage?.(validated);
       } catch (err) {
-        this.logger.error("onDomainMessage threw (swallowed):", err);
+        this.logger.error('onDomainMessage threw (swallowed):', err);
       }
     } else if (this.opts.onDomainMessage) {
       try {
         this.opts.onDomainMessage(parsed as TIn);
       } catch (err) {
-        this.logger.error("onDomainMessage threw (swallowed):", err);
+        this.logger.error('onDomainMessage threw (swallowed):', err);
       }
     }
   }
 
   private tryRouteShared(parsed: unknown): boolean {
-    if (!parsed || typeof parsed !== "object") return false;
+    if (!parsed || typeof parsed !== 'object') return false;
     const obj = parsed as { type?: string };
-    if (obj.type === "app.release.published") {
+    if (obj.type === 'app.release.published') {
       const msg = parsed as {
         version?: unknown;
         downloadUrl?: unknown;
@@ -406,15 +393,12 @@ export class SatelliteWSClient<
         kind?: unknown;
       };
       if (
-        typeof msg.version !== "string" ||
-        typeof msg.downloadUrl !== "string" ||
-        typeof msg.sha256 !== "string" ||
-        typeof msg.kind !== "string"
+        typeof msg.version !== 'string' ||
+        typeof msg.downloadUrl !== 'string' ||
+        typeof msg.sha256 !== 'string' ||
+        typeof msg.kind !== 'string'
       ) {
-        this.logger.warn(
-          "app.release.published with invalid shape; dropping:",
-          parsed,
-        );
+        this.logger.warn('app.release.published with invalid shape; dropping:', parsed);
         return true;
       }
       let canonical: SatelliteKind;
@@ -436,15 +420,15 @@ export class SatelliteWSClient<
         downloadUrl: msg.downloadUrl,
         sha256: msg.sha256,
       };
-      this.emit("release", payload);
+      this.emit('release', payload);
       return true;
     }
-    if (obj.type === "device.revoked") {
+    if (obj.type === 'device.revoked') {
       const msg = parsed as { reason?: unknown };
       const payload: RevokedEventPayload = {
-        reason: typeof msg.reason === "string" ? msg.reason : "unknown",
+        reason: typeof msg.reason === 'string' ? msg.reason : 'unknown',
       };
-      this.emit("revoked", payload);
+      this.emit('revoked', payload);
       return true;
     }
     return false;
@@ -454,11 +438,11 @@ export class SatelliteWSClient<
     this.cleanupHeartbeat();
     this.heartbeatTimer = setInterval(() => {
       if (myGeneration !== this.generation) return;
-      if (!this.socket || this.state !== "connected") return;
+      if (!this.socket || this.state !== 'connected') return;
       try {
         this.socket.ping();
       } catch (err) {
-        this.logger.warn("ping failed:", err);
+        this.logger.warn('ping failed:', err);
       }
       const appHb = this.opts.heartbeat?.appHeartbeat?.();
       if (appHb !== null && appHb !== undefined) {
@@ -472,11 +456,7 @@ export class SatelliteWSClient<
           `heartbeat pong timeout after ${this.heartbeatCfg.pongTimeoutMs}ms; forceReconnect`,
         );
         this.cleanupHeartbeat();
-        this.handleErrorPath(
-          new Error("heartbeat pong timeout"),
-          myGeneration,
-          "heartbeat",
-        );
+        this.handleErrorPath(new Error('heartbeat pong timeout'), myGeneration, 'heartbeat');
       }, this.heartbeatCfg.pongTimeoutMs);
     }, this.heartbeatCfg.intervalMs);
   }
@@ -501,14 +481,14 @@ export class SatelliteWSClient<
 
   private handleAuthFailure(myGeneration: number): void {
     if (myGeneration !== this.generation || this.destroyed) return;
-    this.setState("error");
-    this.scheduleReconnect("error");
+    this.setState('error');
+    this.scheduleReconnect('error');
   }
 
   private handleErrorPath(
     err: Error | undefined,
     myGeneration: number,
-    phase: ShouldReconnectInfo["phase"],
+    phase: ShouldReconnectInfo['phase'],
     closeCode?: number,
   ): void {
     if (myGeneration !== this.generation || this.destroyed) return;
@@ -522,20 +502,20 @@ export class SatelliteWSClient<
       this.logger.info(
         `shouldReconnect returned false (phase=${phase}, closeCode=${closeCode}); staying closed`,
       );
-      this.setState("closed");
+      this.setState('closed');
       return;
     }
     this.scheduleReconnect(phase);
   }
 
-  private scheduleReconnect(phase: ShouldReconnectInfo["phase"]): void {
+  private scheduleReconnect(phase: ShouldReconnectInfo['phase']): void {
     this.reconnectAttempts += 1;
     if (this.reconnectAttempts > this.reconnectCfg.maxAttempts) {
       this.logger.error(
         `max reconnect attempts (${this.reconnectCfg.maxAttempts}) reached; giving up`,
       );
-      this.setState("closed");
-      this.emit("error", new Error("max reconnect attempts reached"));
+      this.setState('closed');
+      this.emit('error', new Error('max reconnect attempts reached'));
       return;
     }
     const base = Math.min(
@@ -547,7 +527,7 @@ export class SatelliteWSClient<
     this.logger.info(
       `reconnecting in ${delay}ms (attempt ${this.reconnectAttempts}, phase=${phase})`,
     );
-    this.setState("reconnecting");
+    this.setState('reconnecting');
     this.cancelReconnect();
     this.reconnectTimer = setTimeout(() => {
       if (this.destroyed) return;

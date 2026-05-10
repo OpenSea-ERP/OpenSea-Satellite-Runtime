@@ -4,8 +4,8 @@
  * in PrintServer and Emporion. Only runs in packaged builds (so dev can
  * point at localhost without churn).
  */
-import { app } from "electron";
-import log from "electron-log";
+import { app } from 'electron';
+import log from 'electron-log';
 
 export interface MigrateApiUrlOptions {
   /** Reader for the current persisted value. */
@@ -24,11 +24,9 @@ export interface MigrateApiUrlOptions {
 
 export function migrateApiUrl(options: MigrateApiUrlOptions): void {
   if (!options.force && !app.isPackaged) return;
-  const fieldName = options.fieldName ?? "apiUrl";
+  const fieldName = options.fieldName ?? 'apiUrl';
   const staleSet =
-    options.staleUrls instanceof Set
-      ? options.staleUrls
-      : new Set(options.staleUrls);
+    options.staleUrls instanceof Set ? options.staleUrls : new Set(options.staleUrls);
   try {
     const current = options.read();
     if (staleSet.has(current)) {
@@ -38,9 +36,6 @@ export function migrateApiUrl(options: MigrateApiUrlOptions): void {
       options.write(options.canonicalUrl);
     }
   } catch (err) {
-    log.error(
-      `[satellite-runtime/migrate-api-url] migration of ${fieldName} failed:`,
-      err,
-    );
+    log.error(`[satellite-runtime/migrate-api-url] migration of ${fieldName} failed:`, err);
   }
 }

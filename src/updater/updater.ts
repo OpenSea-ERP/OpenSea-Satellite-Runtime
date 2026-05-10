@@ -10,11 +10,12 @@
  * State persisted via `createStore` namespaced as `updater.preferences` —
  * the satellite never has to mount the store itself.
  */
-import { autoUpdater } from "electron-updater";
-import { BrowserWindow } from "electron";
-import log from "electron-log";
-import { z } from "zod";
-import { createStore, type SatelliteStore } from "../store/store";
+
+import { BrowserWindow } from 'electron';
+import log from 'electron-log';
+import { autoUpdater } from 'electron-updater';
+import { z } from 'zod';
+import { createStore, type SatelliteStore } from '../store/store';
 
 // ── Timing constants (paridade com Horus + Emporion + PrintServer) ─────────
 /** 24-hour flat retry on failure. */
@@ -34,7 +35,7 @@ let prefStore: SatelliteStore<typeof updaterPrefsSchema> | null = null;
 function getPrefStore(): SatelliteStore<typeof updaterPrefsSchema> {
   if (!prefStore) {
     prefStore = createStore({
-      name: "updater.preferences",
+      name: 'updater.preferences',
       schema: updaterPrefsSchema,
       defaults: { pendingUpdateVersion: null, lastFailedUpdateAt: null },
     });
@@ -56,7 +57,7 @@ export interface SetupUpdaterOptions {
    */
   suppressBenignReleasesAtom404?: boolean;
   /** Release channel. Default `'latest'`. */
-  channel?: "latest" | "beta";
+  channel?: 'latest' | 'beta';
   /** electron-updater autoDownload. Default `true`. */
   autoDownload?: boolean;
   /** electron-updater autoInstallOnAppQuit. Default `true`. */
@@ -88,13 +89,13 @@ export interface AnnouncedRelease {
 }
 
 export type UpdateStatusPayload =
-  | { status: "checking" }
-  | { status: "available"; version: string }
-  | { status: "up-to-date" }
-  | { status: "downloading"; progress: number }
-  | { status: "downloaded"; version: string }
+  | { status: 'checking' }
+  | { status: 'available'; version: string }
+  | { status: 'up-to-date' }
+  | { status: 'downloading'; progress: number }
+  | { status: 'downloaded'; version: string }
   | {
-      status: "error";
+      status: 'error';
       error: string;
       message: string;
       lastFailedAt: number | null;
@@ -111,16 +112,15 @@ let announcedRelease: InternalAnnounced | null = null;
 let retryTimer: ReturnType<typeof setTimeout> | null = null;
 let checkInterval: ReturnType<typeof setInterval> | null = null;
 let pendingReemitTimer: ReturnType<typeof setTimeout> | null = null;
-let resolvedFlags: SetupUpdaterOptions["quitAndInstallFlags"] = {
+let resolvedFlags: SetupUpdaterOptions['quitAndInstallFlags'] = {
   silent: true,
   forceRunAfter: true,
 };
-let resolvedIpcChannel = "updater:status";
+let resolvedIpcChannel = 'updater:status';
 let resolvedSuppress404 = false;
 let resolvedRetryMs = RETRY_24H;
 let resolvedCheckIntervalMs = CHECK_INTERVAL_6H;
-let resolvedWindows: () => BrowserWindow[] = () =>
-  BrowserWindow.getAllWindows();
+let resolvedWindows: () => BrowserWindow[] = () => BrowserWindow.getAllWindows();
 let initialized = false;
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -165,65 +165,61 @@ const registeredHandlers: RegisteredHandlers = {};
 
 function clearAutoUpdaterListeners(): void {
   if (registeredHandlers.checking) {
-    autoUpdater.off("checking-for-update", registeredHandlers.checking);
+    autoUpdater.off('checking-for-update', registeredHandlers.checking);
     registeredHandlers.checking = undefined;
   }
   if (registeredHandlers.available) {
-    autoUpdater.off("update-available", registeredHandlers.available);
+    autoUpdater.off('update-available', registeredHandlers.available);
     registeredHandlers.available = undefined;
   }
   if (registeredHandlers.notAvailable) {
-    autoUpdater.off("update-not-available", registeredHandlers.notAvailable);
+    autoUpdater.off('update-not-available', registeredHandlers.notAvailable);
     registeredHandlers.notAvailable = undefined;
   }
   if (registeredHandlers.progress) {
-    autoUpdater.off("download-progress", registeredHandlers.progress);
+    autoUpdater.off('download-progress', registeredHandlers.progress);
     registeredHandlers.progress = undefined;
   }
   if (registeredHandlers.downloaded) {
-    autoUpdater.off("update-downloaded", registeredHandlers.downloaded);
+    autoUpdater.off('update-downloaded', registeredHandlers.downloaded);
     registeredHandlers.downloaded = undefined;
   }
   if (registeredHandlers.error) {
-    autoUpdater.off("error", registeredHandlers.error);
+    autoUpdater.off('error', registeredHandlers.error);
     registeredHandlers.error = undefined;
   }
 }
 
 function isBenignReleasesAtom404(err: unknown): boolean {
-  const message = err instanceof Error ? err.message : String(err ?? "");
-  return message.includes("404") && message.includes("releases.atom");
+  const message = err instanceof Error ? err.message : String(err ?? '');
+  return message.includes('404') && message.includes('releases.atom');
 }
 
 function reportError(err: unknown): void {
   if (resolvedSuppress404 && isBenignReleasesAtom404(err)) {
     log.warn(
-      "[satellite-runtime/updater] feed indisponível (repo privado sem token); update manual requerido",
+      '[satellite-runtime/updater] feed indisponível (repo privado sem token); update manual requerido',
     );
     return;
   }
-  const message = err instanceof Error ? err.message : "Erro desconhecido";
-  log.error("[satellite-runtime/updater] Erro:", err);
+  const message = err instanceof Error ? err.message : 'Erro desconhecido';
+  log.error('[satellite-runtime/updater] Erro:', err);
 
-  getPrefStore().set("lastFailedUpdateAt", Date.now());
+  getPrefStore().set('lastFailedUpdateAt', Date.now());
 
   broadcast({
-    status: "error",
+    status: 'error',
     error: message,
     message,
-    lastFailedAt: getPrefStore().get("lastFailedUpdateAt"),
+    lastFailedAt: getPrefStore().get('lastFailedUpdateAt'),
   });
 
   if (retryTimer) clearTimeout(retryTimer);
   retryTimer = setTimeout(() => {
-    log.info(
-      "[satellite-runtime/updater] Retry — verificando atualizações novamente...",
-    );
+    log.info('[satellite-runtime/updater] Retry — verificando atualizações novamente...');
     void autoUpdater
       .checkForUpdates()
-      .catch((e) =>
-        log.warn("[satellite-runtime/updater] retry falhou:", e),
-      );
+      .catch((e) => log.warn('[satellite-runtime/updater] retry falhou:', e));
   }, resolvedRetryMs);
 }
 
@@ -248,7 +244,7 @@ export function setupUpdater(options: SetupUpdaterOptions = {}): UpdaterHandle {
     silent: true,
     forceRunAfter: true,
   };
-  resolvedIpcChannel = options.ipcChannel ?? "updater:status";
+  resolvedIpcChannel = options.ipcChannel ?? 'updater:status';
   resolvedSuppress404 = options.suppressBenignReleasesAtom404 ?? false;
   resolvedRetryMs = options.retryMs ?? RETRY_24H;
   resolvedCheckIntervalMs = options.checkIntervalMs ?? CHECK_INTERVAL_6H;
@@ -264,27 +260,27 @@ export function setupUpdater(options: SetupUpdaterOptions = {}): UpdaterHandle {
   // Register handlers via tracked refs so re-init can off() only OUR
   // listeners, preserving any external ones (Codex Issue 3).
   registeredHandlers.checking = () => {
-    log.info("[satellite-runtime/updater] Verificando atualizações...");
-    broadcast({ status: "checking" });
+    log.info('[satellite-runtime/updater] Verificando atualizações...');
+    broadcast({ status: 'checking' });
   };
   registeredHandlers.available = (info) => {
-    log.info("[satellite-runtime/updater] Atualização disponível:", info.version);
+    log.info('[satellite-runtime/updater] Atualização disponível:', info.version);
     if (announcedRelease && announcedRelease.version !== info.version) {
       log.warn(
         `[satellite-runtime/updater] Versão divergente: backend anunciou ${announcedRelease.version} via WS, electron-updater encontrou ${info.version}.`,
       );
     }
-    broadcast({ status: "available", version: info.version });
+    broadcast({ status: 'available', version: info.version });
   };
   registeredHandlers.notAvailable = () => {
-    log.info("[satellite-runtime/updater] Nenhuma atualização disponível");
-    broadcast({ status: "up-to-date" });
+    log.info('[satellite-runtime/updater] Nenhuma atualização disponível');
+    broadcast({ status: 'up-to-date' });
   };
   registeredHandlers.progress = (progress) => {
-    broadcast({ status: "downloading", progress: progress.percent });
+    broadcast({ status: 'downloading', progress: progress.percent });
   };
   registeredHandlers.downloaded = (info) => {
-    log.info("[satellite-runtime/updater] Atualização baixada:", info.version);
+    log.info('[satellite-runtime/updater] Atualização baixada:', info.version);
     if (announcedRelease) {
       if (announcedRelease.version === info.version) {
         log.info(
@@ -296,38 +292,36 @@ export function setupUpdater(options: SetupUpdaterOptions = {}): UpdaterHandle {
         );
       }
     }
-    getPrefStore().set("pendingUpdateVersion", info.version);
-    broadcast({ status: "downloaded", version: info.version });
+    getPrefStore().set('pendingUpdateVersion', info.version);
+    broadcast({ status: 'downloaded', version: info.version });
   };
   registeredHandlers.error = reportError;
 
-  autoUpdater.on("checking-for-update", registeredHandlers.checking);
-  autoUpdater.on("update-available", registeredHandlers.available);
-  autoUpdater.on("update-not-available", registeredHandlers.notAvailable);
-  autoUpdater.on("download-progress", registeredHandlers.progress);
-  autoUpdater.on("update-downloaded", registeredHandlers.downloaded);
-  autoUpdater.on("error", registeredHandlers.error);
+  autoUpdater.on('checking-for-update', registeredHandlers.checking);
+  autoUpdater.on('update-available', registeredHandlers.available);
+  autoUpdater.on('update-not-available', registeredHandlers.notAvailable);
+  autoUpdater.on('download-progress', registeredHandlers.progress);
+  autoUpdater.on('update-downloaded', registeredHandlers.downloaded);
+  autoUpdater.on('error', registeredHandlers.error);
 
   // Re-emit pending update from previous session, after small delay so the
   // renderer is ready to receive.
-  const pending = getPrefStore().get("pendingUpdateVersion");
+  const pending = getPrefStore().get('pendingUpdateVersion');
   if (pending) {
     log.info(
       `[satellite-runtime/updater] Update ${pending} pendente de instalação (sessão anterior)`,
     );
     pendingReemitTimer = setTimeout(() => {
-      broadcast({ status: "downloaded", version: pending });
+      broadcast({ status: 'downloaded', version: pending });
     }, 2000);
   }
 
   // Periodic check
   checkInterval = setInterval(() => {
-    log.info("[satellite-runtime/updater] Verificação periódica...");
+    log.info('[satellite-runtime/updater] Verificação periódica...');
     void autoUpdater
       .checkForUpdates()
-      .catch((e) =>
-        log.warn("[satellite-runtime/updater] check periódico falhou:", e),
-      );
+      .catch((e) => log.warn('[satellite-runtime/updater] check periódico falhou:', e));
   }, resolvedCheckIntervalMs);
 
   initialized = true;
@@ -351,13 +345,13 @@ export async function checkForUpdates(): Promise<void> {
     await autoUpdater.checkForUpdates();
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    log.error("[satellite-runtime/updater] Erro ao verificar atualizações:", error);
+    log.error('[satellite-runtime/updater] Erro ao verificar atualizações:', error);
     if (!(resolvedSuppress404 && isBenignReleasesAtom404(error))) {
       broadcast({
-        status: "error",
+        status: 'error',
         error: message,
         message,
-        lastFailedAt: getPrefStore().get("lastFailedUpdateAt"),
+        lastFailedAt: getPrefStore().get('lastFailedUpdateAt'),
       });
     }
     throw error;
@@ -377,10 +371,10 @@ export async function checkForUpdates(): Promise<void> {
 export function quitAndInstall(): void {
   if (!initialized) {
     throw new Error(
-      "[satellite-runtime/updater] quitAndInstall() called before setupUpdater(). Call setupUpdater() first to apply quitAndInstallFlags.",
+      '[satellite-runtime/updater] quitAndInstall() called before setupUpdater(). Call setupUpdater() first to apply quitAndInstallFlags.',
     );
   }
-  getPrefStore().set("pendingUpdateVersion", null);
+  getPrefStore().set('pendingUpdateVersion', null);
   const flags = resolvedFlags ?? { silent: true, forceRunAfter: true };
   autoUpdater.quitAndInstall(flags.silent, flags.forceRunAfter);
 }
@@ -418,17 +412,11 @@ export function recordAnnouncedRelease(release: AnnouncedRelease): void {
  */
 export function primeUpdaterStore(seed: Partial<UpdaterPrefs>): void {
   const store = getPrefStore();
-  if (
-    seed.pendingUpdateVersion !== undefined &&
-    store.get("pendingUpdateVersion") === null
-  ) {
-    store.set("pendingUpdateVersion", seed.pendingUpdateVersion);
+  if (seed.pendingUpdateVersion !== undefined && store.get('pendingUpdateVersion') === null) {
+    store.set('pendingUpdateVersion', seed.pendingUpdateVersion);
   }
-  if (
-    seed.lastFailedUpdateAt !== undefined &&
-    store.get("lastFailedUpdateAt") === null
-  ) {
-    store.set("lastFailedUpdateAt", seed.lastFailedUpdateAt);
+  if (seed.lastFailedUpdateAt !== undefined && store.get('lastFailedUpdateAt') === null) {
+    store.set('lastFailedUpdateAt', seed.lastFailedUpdateAt);
   }
 }
 
