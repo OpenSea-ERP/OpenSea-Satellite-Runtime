@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { appMock, logMock } = vi.hoisted(() => ({
   appMock: {
@@ -20,9 +20,9 @@ describe('deep-link', () => {
     vi.clearAllMocks();
     process.argv = ['electron'];
   });
-  afterAll: () => {
+  afterAll(() => {
     process.argv = originalArgv;
-  };
+  });
 
   it('registers protocol via app.setAsDefaultProtocolClient', () => {
     registerDeepLink({ protocol: 'opensea', onUrl: vi.fn() });

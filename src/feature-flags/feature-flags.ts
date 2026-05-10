@@ -30,7 +30,7 @@ async function fetchOnce(opts: FeatureFlagsOptions): Promise<void> {
   try {
     const headers: Record<string, string> = {};
     const auth = opts.authHeader?.();
-    if (auth) headers['Authorization'] = auth;
+    if (auth) headers.Authorization = auth;
     const res = await fetcher(opts.endpoint(), { headers });
     if (!res.ok) {
       log.warn(`[satellite-runtime/feature-flags] fetch ${res.status}; keeping cache`);

@@ -74,7 +74,7 @@ describe('window-state', () => {
   it('persists on resize', () => {
     const win = makeWin();
     restoreWindowState(win as never, 'main');
-    win.handlers['resize']?.();
+    win.handlers.resize?.();
     expect(memStore.has('main')).toBe(true);
   });
 

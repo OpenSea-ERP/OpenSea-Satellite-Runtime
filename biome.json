@@ -45,8 +45,7 @@
       "suspicious": {
         "noExplicitAny": "off",
         "noEmptyBlockStatements": "off",
-        "noArrayIndexKey": "warn",
-        "noConfusingLabels": "warn"
+        "noArrayIndexKey": "warn"
       },
       "a11y": {
         "useKeyWithClickEvents": "off",
