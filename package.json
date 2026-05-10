@@ -18,36 +18,147 @@
     "create-opensea-satellite": "scaffolding/bin/create-opensea-satellite.js"
   },
   "exports": {
-    ".": { "types": "./dist/index.d.ts", "require": "./dist/index.js", "default": "./dist/index.js" },
-    "./auto-launch": { "types": "./dist/auto-launch/index.d.ts", "require": "./dist/auto-launch/index.js", "default": "./dist/auto-launch/index.js" },
-    "./window-state": { "types": "./dist/window-state/index.d.ts", "require": "./dist/window-state/index.js", "default": "./dist/window-state/index.js" },
-    "./single-instance": { "types": "./dist/single-instance/index.d.ts", "require": "./dist/single-instance/index.js", "default": "./dist/single-instance/index.js" },
-    "./tray": { "types": "./dist/tray/index.d.ts", "require": "./dist/tray/index.js", "default": "./dist/tray/index.js" },
-    "./splash": { "types": "./dist/splash/index.d.ts", "require": "./dist/splash/index.js", "default": "./dist/splash/index.js" },
-    "./graceful-shutdown": { "types": "./dist/graceful-shutdown/index.d.ts", "require": "./dist/graceful-shutdown/index.js", "default": "./dist/graceful-shutdown/index.js" },
-    "./store": { "types": "./dist/store/index.d.ts", "require": "./dist/store/index.js", "default": "./dist/store/index.js" },
-    "./log": { "types": "./dist/log/index.d.ts", "require": "./dist/log/index.js", "default": "./dist/log/index.js" },
-    "./quit-prompt": { "types": "./dist/quit-prompt/index.d.ts", "require": "./dist/quit-prompt/index.js", "default": "./dist/quit-prompt/index.js" },
-    "./updater": { "types": "./dist/updater/index.d.ts", "require": "./dist/updater/index.js", "default": "./dist/updater/index.js" },
-    "./ws-client": { "types": "./dist/ws-client/index.d.ts", "require": "./dist/ws-client/index.js", "default": "./dist/ws-client/index.js" },
-    "./connection-state": { "types": "./dist/connection-state/index.d.ts", "require": "./dist/connection-state/index.js", "default": "./dist/connection-state/index.js" },
-    "./secure-store": { "types": "./dist/secure-store/index.d.ts", "require": "./dist/secure-store/index.js", "default": "./dist/secure-store/index.js" },
-    "./migrate-api-url": { "types": "./dist/migrate-api-url/index.d.ts", "require": "./dist/migrate-api-url/index.js", "default": "./dist/migrate-api-url/index.js" },
-    "./crash-reporter": { "types": "./dist/crash-reporter/index.d.ts", "require": "./dist/crash-reporter/index.js", "default": "./dist/crash-reporter/index.js" },
-    "./telemetry": { "types": "./dist/telemetry/index.d.ts", "require": "./dist/telemetry/index.js", "default": "./dist/telemetry/index.js" },
-    "./export-logs": { "types": "./dist/export-logs/index.d.ts", "require": "./dist/export-logs/index.js", "default": "./dist/export-logs/index.js" },
-    "./ui": { "types": "./dist/ui/index.d.ts", "default": "./dist/ui/index.js" },
-    "./sleep-prevention": { "types": "./dist/sleep-prevention/index.d.ts", "require": "./dist/sleep-prevention/index.js", "default": "./dist/sleep-prevention/index.js" },
-    "./kiosk-mode": { "types": "./dist/kiosk-mode/index.d.ts", "require": "./dist/kiosk-mode/index.js", "default": "./dist/kiosk-mode/index.js" },
-    "./deep-link": { "types": "./dist/deep-link/index.d.ts", "require": "./dist/deep-link/index.js", "default": "./dist/deep-link/index.js" },
-    "./ipc-registry": { "types": "./dist/ipc-registry/index.d.ts", "require": "./dist/ipc-registry/index.js", "default": "./dist/ipc-registry/index.js" },
-    "./feature-flags": { "types": "./dist/feature-flags/index.d.ts", "require": "./dist/feature-flags/index.js", "default": "./dist/feature-flags/index.js" },
-    "./i18n": { "types": "./dist/i18n/index.d.ts", "require": "./dist/i18n/index.js", "default": "./dist/i18n/index.js" },
-    "./testing": { "types": "./dist/testing/index.d.ts", "require": "./dist/testing/index.js", "default": "./dist/testing/index.js" },
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./auto-launch": {
+      "types": "./dist/auto-launch/index.d.ts",
+      "require": "./dist/auto-launch/index.js",
+      "default": "./dist/auto-launch/index.js"
+    },
+    "./window-state": {
+      "types": "./dist/window-state/index.d.ts",
+      "require": "./dist/window-state/index.js",
+      "default": "./dist/window-state/index.js"
+    },
+    "./single-instance": {
+      "types": "./dist/single-instance/index.d.ts",
+      "require": "./dist/single-instance/index.js",
+      "default": "./dist/single-instance/index.js"
+    },
+    "./tray": {
+      "types": "./dist/tray/index.d.ts",
+      "require": "./dist/tray/index.js",
+      "default": "./dist/tray/index.js"
+    },
+    "./splash": {
+      "types": "./dist/splash/index.d.ts",
+      "require": "./dist/splash/index.js",
+      "default": "./dist/splash/index.js"
+    },
+    "./graceful-shutdown": {
+      "types": "./dist/graceful-shutdown/index.d.ts",
+      "require": "./dist/graceful-shutdown/index.js",
+      "default": "./dist/graceful-shutdown/index.js"
+    },
+    "./store": {
+      "types": "./dist/store/index.d.ts",
+      "require": "./dist/store/index.js",
+      "default": "./dist/store/index.js"
+    },
+    "./log": {
+      "types": "./dist/log/index.d.ts",
+      "require": "./dist/log/index.js",
+      "default": "./dist/log/index.js"
+    },
+    "./quit-prompt": {
+      "types": "./dist/quit-prompt/index.d.ts",
+      "require": "./dist/quit-prompt/index.js",
+      "default": "./dist/quit-prompt/index.js"
+    },
+    "./updater": {
+      "types": "./dist/updater/index.d.ts",
+      "require": "./dist/updater/index.js",
+      "default": "./dist/updater/index.js"
+    },
+    "./ws-client": {
+      "types": "./dist/ws-client/index.d.ts",
+      "require": "./dist/ws-client/index.js",
+      "default": "./dist/ws-client/index.js"
+    },
+    "./connection-state": {
+      "types": "./dist/connection-state/index.d.ts",
+      "require": "./dist/connection-state/index.js",
+      "default": "./dist/connection-state/index.js"
+    },
+    "./secure-store": {
+      "types": "./dist/secure-store/index.d.ts",
+      "require": "./dist/secure-store/index.js",
+      "default": "./dist/secure-store/index.js"
+    },
+    "./migrate-api-url": {
+      "types": "./dist/migrate-api-url/index.d.ts",
+      "require": "./dist/migrate-api-url/index.js",
+      "default": "./dist/migrate-api-url/index.js"
+    },
+    "./crash-reporter": {
+      "types": "./dist/crash-reporter/index.d.ts",
+      "require": "./dist/crash-reporter/index.js",
+      "default": "./dist/crash-reporter/index.js"
+    },
+    "./telemetry": {
+      "types": "./dist/telemetry/index.d.ts",
+      "require": "./dist/telemetry/index.js",
+      "default": "./dist/telemetry/index.js"
+    },
+    "./export-logs": {
+      "types": "./dist/export-logs/index.d.ts",
+      "require": "./dist/export-logs/index.js",
+      "default": "./dist/export-logs/index.js"
+    },
+    "./ui": {
+      "types": "./dist/ui/index.d.ts",
+      "default": "./dist/ui/index.js"
+    },
+    "./sleep-prevention": {
+      "types": "./dist/sleep-prevention/index.d.ts",
+      "require": "./dist/sleep-prevention/index.js",
+      "default": "./dist/sleep-prevention/index.js"
+    },
+    "./kiosk-mode": {
+      "types": "./dist/kiosk-mode/index.d.ts",
+      "require": "./dist/kiosk-mode/index.js",
+      "default": "./dist/kiosk-mode/index.js"
+    },
+    "./deep-link": {
+      "types": "./dist/deep-link/index.d.ts",
+      "require": "./dist/deep-link/index.js",
+      "default": "./dist/deep-link/index.js"
+    },
+    "./ipc-registry": {
+      "types": "./dist/ipc-registry/index.d.ts",
+      "require": "./dist/ipc-registry/index.js",
+      "default": "./dist/ipc-registry/index.js"
+    },
+    "./feature-flags": {
+      "types": "./dist/feature-flags/index.d.ts",
+      "require": "./dist/feature-flags/index.js",
+      "default": "./dist/feature-flags/index.js"
+    },
+    "./i18n": {
+      "types": "./dist/i18n/index.d.ts",
+      "require": "./dist/i18n/index.js",
+      "default": "./dist/i18n/index.js"
+    },
+    "./testing": {
+      "types": "./dist/testing/index.d.ts",
+      "require": "./dist/testing/index.js",
+      "default": "./dist/testing/index.js"
+    },
     "./package.json": "./package.json"
   },
-  "files": ["dist", "scaffolding", "README.md", "CHANGELOG.md", "LICENSE"],
-  "engines": { "node": ">=20" },
+  "files": [
+    "dist",
+    "scaffolding",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "clean": "rimraf dist",
@@ -55,14 +166,20 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "lint": "biome check",
+    "lint:fix": "biome check --write",
+    "format": "biome format --write",
+    "ci": "biome ci"
   },
   "peerDependencies": {
     "electron": ">=33",
     "react": ">=18"
   },
   "peerDependenciesMeta": {
-    "react": { "optional": true }
+    "react": {
+      "optional": true
+    }
   },
   "dependencies": {
     "@opensea/satellite-contract": "git+https://github.com/OpenSea-ERP/OpenSea-Satellite-Contract.git#v0.1.0",
@@ -75,6 +192,7 @@
     "zod": "^3.23.0"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.4.15",
     "@types/auto-launch": "^5.0.5",
     "@types/node": "20.16.0",
     "@types/react": "^19.0.0",
