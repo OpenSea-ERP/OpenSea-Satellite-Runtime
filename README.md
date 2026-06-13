@@ -1,20 +1,38 @@
 # `@opensea/satellite-runtime`
 
-Runtime modules for OpenSea satellite desktop apps (`OpenSea-Emporion`,
-`OpenSea-Horus`, `OpenSea-PrintServer`). Lifecycle, boot, persistence,
-logging — all the boring-but-critical Electron infrastructure that every
-satellite needs, packaged once and reused.
+Pacote de módulos de runtime para os apps satélite **Electron** do ecossistema OpenSea — toda a infraestrutura de ciclo de vida, boot, persistência, conexão e observabilidade que cada satélite precisa, empacotada uma vez e reaproveitada.
 
-## Versão
+[![CI](https://github.com/OpenSea-ERP/OpenSea-Satellite-Runtime/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenSea-ERP/OpenSea-Satellite-Runtime/actions/workflows/ci.yml)
+![Versão](https://img.shields.io/badge/versão-1.0.0-blue)
+![Node](https://img.shields.io/badge/node->=20-green)
+![Electron](https://img.shields.io/badge/electron->=33%20(peer)-47848F)
+![Licença](https://img.shields.io/badge/licença-PROPRIETARY-lightgrey)
 
-**v1.0.0** — Primeira release estável. 22 módulos consumidos por todos os 3
-satélites instaláveis OpenSea (Emporion, Horus, PrintServer) em produção
-desde 2026-05-03.
+## 📑 Sumário
 
-## Instalação
+- [Visão geral](#-visão-geral)
+- [Instalação](#-instalação)
+- [Módulos](#-módulos)
+- [Uso](#-uso)
+- [devGuard](#-devguard)
+- [Scaffolding](#-scaffolding)
+- [Scripts](#-scripts)
+- [Estrutura](#-estrutura)
+- [Contribuindo](#-contribuindo)
+- [Licença](#-licença)
 
-Distribuído via Git URL público (sem npm registry). No `package.json` do
-satélite consumidor:
+## 🏗️ Visão geral
+
+`@opensea/satellite-runtime` reúne os módulos de runtime consumidos pelos satélites instaláveis OpenSea (ex.: `OpenSea-Emporion`, `OpenSea-Horus`, `OpenSea-PrintServer`). Em vez de cada app reimplementar auto-launch, persistência, tray, updater e afins, todos importam o mesmo runtime testado.
+
+Cada módulo é um **sub-path importável independente** (`@opensea/satellite-runtime/<módulo>`), então você importa só o que usa. O pacote é distribuído via **Git URL** (não publicado em registry npm).
+
+> [!NOTE]
+> Companion: [`@opensea/satellite-contract`](https://github.com/OpenSea-ERP/OpenSea-Satellite-Contract) define os **contratos/tipos** compartilhados entre servidor e satélites. O runtime depende dele e o consome internamente (canais IPC, payloads WS, etc.). Use os dois juntos.
+
+## 📦 Instalação
+
+Distribuído via Git URL — fixe sempre uma tag. No `package.json` do satélite consumidor:
 
 ```json
 {
@@ -28,76 +46,83 @@ satélite consumidor:
 npm install
 ```
 
-> **Tip:** Se um bump de git ref não pegar (`npm install` reporta "up to date"
-> mas a versão antiga continua em `node_modules`), o lock está cacheado.
-> Solução: `rm -rf node_modules/@opensea && rm -f package-lock.json && npm install`.
+**Peer dependencies** (instale no app consumidor):
 
-## Módulos (v1.0.0)
+| Peer | Versão | Obrigatória |
+| --- | --- | :---: |
+| `electron` | `>=33` | ✅ |
+| `react` | `>=18` | — (só para o módulo `ui`) |
 
-Cada módulo é um sub-path importável independente.
+> [!TIP]
+> Se um bump de git ref não pegar (`npm install` reporta "up to date" mas a versão antiga continua em `node_modules`), o lock está cacheado. Solução: `rm -rf node_modules/@opensea && rm -f package-lock.json && npm install`.
+
+## 🧩 Módulos
+
+Cada linha abaixo é um sub-path importável: `@opensea/satellite-runtime/<módulo>`.
 
 ### Foundation
 
-| Módulo | Import path | Função |
-|--------|-------------|--------|
-| auto-launch | `@opensea/satellite-runtime/auto-launch` | Inicialização automática no boot do OS (com devGuard em dev) |
-| window-state | `@opensea/satellite-runtime/window-state` | Persistir tamanho/posição de janelas |
-| single-instance | `@opensea/satellite-runtime/single-instance` | Garantir 1 instância do app |
-| tray | `@opensea/satellite-runtime/tray` | Ícone + menu na bandeja do sistema |
-| splash | `@opensea/satellite-runtime/splash` | Janela de boot durante init |
-| graceful-shutdown | `@opensea/satellite-runtime/graceful-shutdown` | Handlers de shutdown ordenado, once-guarded |
-| store | `@opensea/satellite-runtime/store` | Persistência tipada (zod schemas) com migrations e corruption recovery |
-| log | `@opensea/satellite-runtime/log` | Setup centralizado do electron-log |
-| quit-prompt | `@opensea/satellite-runtime/quit-prompt` | Dialog "fechar ou minimizar" com lembrar |
+| Módulo | O que faz |
+| --- | --- |
+| `auto-launch` | Inicialização automática no boot do SO (`setupAutoLaunch`, `enable/disable/toggle/isAutoLaunchEnabled`); guardado em dev |
+| `window-state` | Persiste e restaura tamanho/posição de janelas |
+| `single-instance` | Garante uma única instância do app (`ensureSingleInstance`) |
+| `tray` | Ícone + menu na bandeja do sistema (`createSatelliteTray`) |
+| `splash` | Janela de splash exibida durante o boot/init |
+| `graceful-shutdown` | Handlers de shutdown ordenado, com once-guard (`registerShutdownHandler`, `runShutdownHandlers`) |
+| `store` | Persistência tipada com schemas zod, migrations e recuperação de corrupção (`createStore`) |
+| `log` | Setup centralizado do `electron-log` (`setupLog`, `getLogger`) |
+| `quit-prompt` | Diálogo "fechar ou minimizar" com opção de lembrar a escolha |
 
-### Lifecycle + Conexão
+### Ciclo de vida + Conexão
 
-| Módulo | Import path | Função |
-|--------|-------------|--------|
-| updater | `@opensea/satellite-runtime/updater` | Wrapper electron-updater com retry 24h, periodic 6h, WS cross-check, channel switching, primeUpdaterStore |
-| ws-client | `@opensea/satellite-runtime/ws-client` | `SatelliteWSClient` (lib `ws`) com reconnect + jitter, generation guard, heartbeat, hello/bearer auth |
-| connection-state | `@opensea/satellite-runtime/connection-state` | Broadcaster IPC narrow para `connection:status` |
+| Módulo | O que faz |
+| --- | --- |
+| `updater` | Wrapper sobre `electron-updater` (retry 24h, checagem periódica 6h, cross-check via WS, troca de canal) |
+| `ws-client` | `SatelliteWSClient` (lib `ws`) com reconnect + jitter, generation guard, heartbeat e auth hello/bearer |
+| `connection-state` | Broadcaster IPC estreito para o status `connection:status` |
 
 ### Identidade
 
-| Módulo | Import path | Função |
-|--------|-------------|--------|
-| secure-store | `@opensea/satellite-runtime/secure-store` | Wrapper keytar com fallback in-memory automático em `NODE_ENV=test` |
-| migrate-api-url | `@opensea/satellite-runtime/migrate-api-url` | Helper genérico de reescrita de URL stale (default gate `app.isPackaged`) |
+| Módulo | O que faz |
+| --- | --- |
+| `secure-store` | Wrapper sobre `keytar` com fallback automático in-memory em `NODE_ENV=test` |
+| `migrate-api-url` | Helper genérico de reescrita de URL stale (gate padrão `app.isPackaged`) |
 
 ### Observabilidade
 
-| Módulo | Import path | Função |
-|--------|-------------|--------|
-| crash-reporter | `@opensea/satellite-runtime/crash-reporter` | Wrapper sobre `crashReporter` do Electron, idempotente |
-| telemetry | `@opensea/satellite-runtime/telemetry` | Heartbeat opt-in (default disabled), no-PII, daily interval |
-| export-logs | `@opensea/satellite-runtime/export-logs` | Empacota .log files em arquivo único pra handoff de suporte |
+| Módulo | O que faz |
+| --- | --- |
+| `crash-reporter` | Wrapper idempotente sobre o `crashReporter` do Electron |
+| `telemetry` | Heartbeat opt-in (desligado por padrão), sem PII, intervalo diário |
+| `export-logs` | Empacota arquivos `.log` em um único arquivo para handoff de suporte |
 
 ### UI (renderer)
 
-| Módulo | Import path | Função |
-|--------|-------------|--------|
-| ui | `@opensea/satellite-runtime/ui` | `RevokedDialog` + `AboutDialog` + `UpdateBanner` zero-dep React (peer dep `react@>=18` opcional) |
+| Módulo | O que faz |
+| --- | --- |
+| `ui` | Componentes React zero-dependência: `RevokedDialog`, `AboutDialog`, `UpdateBanner` (peer `react@>=18` opcional) |
 
-### Hardware/OS + Segurança/Flags/I18n
+### Hardware/SO + Segurança / Flags / I18n
 
-| Módulo | Import path | Função |
-|--------|-------------|--------|
-| sleep-prevention | `@opensea/satellite-runtime/sleep-prevention` | Wrapper sobre `powerSaveBlocker`, idempotente |
-| kiosk-mode | `@opensea/satellite-runtime/kiosk-mode` | Full-screen + zoom/devtools blockers via `before-input-event` |
-| deep-link | `@opensea/satellite-runtime/deep-link` | `opensea://...` protocol handler cross-platform |
-| ipc-registry | `@opensea/satellite-runtime/ipc-registry` | Typed channel registration com zod payload validation |
-| feature-flags | `@opensea/satellite-runtime/feature-flags` | Remote flag pull com cache, polling, `isEnabled/getString/snapshot` |
-| i18n | `@opensea/satellite-runtime/i18n` | Wrappers Intl pt-BR para date/time/number/currency/relative-time |
+| Módulo | O que faz |
+| --- | --- |
+| `sleep-prevention` | Wrapper idempotente sobre `powerSaveBlocker` |
+| `kiosk-mode` | Full-screen + bloqueio de zoom/devtools via `before-input-event` |
+| `deep-link` | Handler cross-platform do protocolo `opensea://...` |
+| `ipc-registry` | Registro de canais IPC tipados com validação de payload por zod (`registerIpcChannel`) |
+| `feature-flags` | Pull remoto de flags com cache e polling (`setupFeatureFlags`, `isEnabled`, `getString`, `snapshot`) |
+| `i18n` | Wrappers `Intl` pt-BR para data/hora/número/moeda/tempo relativo |
 
-### Scaffolding + Testing
+### Testing
 
-| Módulo | Import path | Função |
-|--------|-------------|--------|
-| scaffolding | `npx create-opensea-satellite my-app` | CLI bin que gera novo satélite pré-wired ao runtime |
-| testing | `@opensea/satellite-runtime/testing` | `mockApp`, `mockStore`, `mockTray`, `mockBrowserWindow` para vitest
+| Módulo | O que faz |
+| --- | --- |
+| `testing` | Mocks para vitest: `mockApp`, `mockStore`, `mockTray`, `mockBrowserWindow` |
 
-## Boot canônico
+## 🚀 Uso
+
+### Boot canônico
 
 ```ts
 import { app } from 'electron';
@@ -106,7 +131,10 @@ import { ensureSingleInstance } from '@opensea/satellite-runtime/single-instance
 import { setupAutoLaunch } from '@opensea/satellite-runtime/auto-launch';
 import { restoreWindowState } from '@opensea/satellite-runtime/window-state';
 import { createSatelliteTray } from '@opensea/satellite-runtime/tray';
-import { registerShutdownHandler, runShutdownHandlers } from '@opensea/satellite-runtime/graceful-shutdown';
+import {
+  registerShutdownHandler,
+  runShutdownHandlers,
+} from '@opensea/satellite-runtime/graceful-shutdown';
 
 setupLog({ scope: 'my-satellite' });
 ensureSingleInstance();
@@ -133,22 +161,93 @@ app.on('before-quit', async (e) => {
 });
 ```
 
-## devGuard
+### Persistência tipada (`store`)
 
-Apenas o módulo `auto-launch` é guardado em dev (`!app.isPackaged` → no-op + warn),
-porque registra entries no autostart do OS. Os demais módulos (`store`, `tray`,
-`window-state`, `single-instance`, `splash`, `quit-prompt`, `graceful-shutdown`,
-`log`) rodam idênticos em dev e packaged — eles tocam apenas estado interno do app.
+```ts
+import { z } from 'zod';
+import { createStore } from '@opensea/satellite-runtime/store';
 
-## Desenvolvimento
+const store = createStore({
+  name: 'settings',
+  schema: z.object({ apiUrl: z.string().url(), autoLaunch: z.boolean() }),
+  defaults: { apiUrl: 'https://api.opensea.com.br', autoLaunch: true },
+});
 
-```bash
-npm install
-npm run typecheck
-npm run test
-npm run build
+store.set('autoLaunch', false);
+const url = store.get('apiUrl');
 ```
 
-## Licença
+### Logger com escopo (`log`)
 
-PROPRIETARY — OpenSea ERP.
+```ts
+import { getLogger } from '@opensea/satellite-runtime/log';
+
+const logger = getLogger('updater');
+logger.info('checando atualizações...');
+```
+
+> [!TIP]
+> Também é possível importar tudo a partir da raiz (`@opensea/satellite-runtime`), mas os sub-paths reduzem o que entra no bundle do renderer.
+
+## 🛡️ devGuard
+
+Apenas o módulo `auto-launch` é guardado em dev (`!app.isPackaged` → no-op + warn), porque registra entries no autostart do SO. Os demais módulos (`store`, `tray`, `window-state`, `single-instance`, `splash`, `quit-prompt`, `graceful-shutdown`, `log`) rodam idênticos em dev e em build empacotado — eles tocam apenas o estado interno do app.
+
+## 🏗️ Scaffolding
+
+O pacote expõe um CLI que gera um novo satélite já pré-conectado ao runtime:
+
+```bash
+npx create-opensea-satellite my-app
+```
+
+## 📜 Scripts
+
+| Script | O que faz |
+| --- | --- |
+| `npm run build` | Compila TypeScript (`tsc`) para `dist/` |
+| `npm run rebuild` | `clean` + `build` |
+| `npm run clean` | Remove `dist/` |
+| `npm run typecheck` | Type-check sem emitir (`tsc --noEmit`) |
+| `npm run test` | Roda os testes (`vitest run`) |
+| `npm run test:watch` | Testes em modo watch |
+| `npm run test:coverage` | Testes com cobertura (v8) |
+| `npm run lint` | Lint via Biome (`biome check`) |
+| `npm run lint:fix` | Lint com auto-fix |
+| `npm run format` | Formata via Biome |
+| `npm run ci` | Verificação Biome para CI (`biome ci`) |
+
+## 🗂️ Estrutura
+
+```
+.
+├── src/              # fonte TS — uma pasta por módulo (index + impl + .spec)
+│   ├── index.ts      # re-exporta todos os módulos
+│   ├── auto-launch/
+│   ├── store/
+│   ├── ws-client/
+│   ├── updater/
+│   ├── ui/           # componentes React
+│   └── ...           # demais módulos
+├── scaffolding/      # CLI create-opensea-satellite + template
+│   ├── bin/
+│   └── template/
+├── dist/             # saída compilada (publicada)
+├── biome.json        # config de lint/format
+├── tsconfig.json
+└── vitest.config.ts
+```
+
+## 🤝 Contribuindo
+
+Fluxo resumido (veja [`CONTRIBUTING.md`](./CONTRIBUTING.md) para o checklist completo de release):
+
+1. Crie uma branch a partir da `main`.
+2. Para um novo módulo: crie `src/<módulo>/{index.ts, <módulo>.ts, <módulo>.spec.ts}`, adicione a entry no mapa `exports` do `package.json` e o re-export em `src/index.ts`.
+3. Garanta `npm run typecheck` e `npm run test` verdes.
+4. Verifique o **dist freshness gate**: `git diff --exit-code -- dist/` deve ficar limpo após `npm run rebuild`.
+5. Abra um PR — o CI precisa passar antes do merge.
+
+## 📄 Licença
+
+**PROPRIETARY** — OpenSea ERP. Todos os direitos reservados; uso exclusivo dentro do ecossistema OpenSea. Veja [LICENSE](./LICENSE).
