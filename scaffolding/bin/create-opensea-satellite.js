@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * `npx create-opensea-satellite <name>` — scaffolds a new Electron satellite
- * pre-wired to `@opensea/satellite-runtime`. Copies template files into a
+ * pre-wired to `@openholt/satellite-runtime`. Copies template files into a
  * new directory, replaces placeholders, and prints next-step instructions.
  *
  * Usage:
@@ -30,7 +30,7 @@ const args = process.argv.slice(2);
 if (args.length === 0 || args[0].startsWith('-')) {
   console.log('Usage: npx create-opensea-satellite <name>');
   console.log('');
-  console.log('Scaffolds a new Electron satellite consuming @opensea/satellite-runtime.');
+  console.log('Scaffolds a new Electron satellite consuming @openholt/satellite-runtime.');
   process.exit(args.length === 0 ? 1 : 0);
 }
 
@@ -70,7 +70,7 @@ function walk(dir, baseFromTemplate) {
 }
 
 if (!fs.existsSync(TEMPLATE_ROOT)) {
-  fail(`Template not found at ${TEMPLATE_ROOT}. Reinstall @opensea/satellite-runtime.`);
+  fail(`Template not found at ${TEMPLATE_ROOT}. Reinstall @openholt/satellite-runtime.`);
 }
 
 fs.mkdirSync(targetDir, { recursive: true });

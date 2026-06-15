@@ -1,6 +1,6 @@
 # OpenSea-Satellite-Runtime
 
-**Kit de runtime para os apps satélite Electron do OpenSea ERP.** O pacote `@opensea/satellite-runtime` reúne ~24 módulos de runtime — ciclo de vida, boot, persistência, conexão e observabilidade — que todo satélite instalável (ex.: `OpenSea-Emporion`, `OpenSea-Horus`, `OpenSea-PrintServer`) precisa, empacotados uma vez e reaproveitados. Em vez de cada app reimplementar auto-launch, persistência, tray, updater e afins, todos importam o mesmo runtime testado. Cada módulo é um **sub-path importável independente** (`@opensea/satellite-runtime/<módulo>`), então o consumidor traz só o que usa. É o **companion do [`@opensea/satellite-contract`](https://github.com/OpenSea-ERP/OpenSea-Satellite-Contract)**, que define os contratos/tipos compartilhados entre servidor e satélites (canais IPC, payloads WS) — o runtime depende dele e o consome internamente. Distribuído via **Git URL**, não publicado em registry npm.
+**Kit de runtime para os apps satélite Electron do OpenSea ERP.** O pacote `@openholt/satellite-runtime` reúne ~24 módulos de runtime — ciclo de vida, boot, persistência, conexão e observabilidade — que todo satélite instalável (ex.: `OpenSea-Emporion`, `OpenSea-Horus`, `OpenSea-PrintServer`) precisa, empacotados uma vez e reaproveitados. Em vez de cada app reimplementar auto-launch, persistência, tray, updater e afins, todos importam o mesmo runtime testado. Cada módulo é um **sub-path importável independente** (`@openholt/satellite-runtime/<módulo>`), então o consumidor traz só o que usa. É o **companion do [`@openholt/satellite-contract`](https://github.com/OpenSea-ERP/OpenSea-Satellite-Contract)**, que define os contratos/tipos compartilhados entre servidor e satélites (canais IPC, payloads WS) — o runtime depende dele e o consome internamente. Distribuído via **Git URL**, não publicado em registry npm.
 
 ## Stack
 
@@ -13,7 +13,7 @@
 
 ## Módulos
 
-Esta é a peça central do pacote. Cada linha é um sub-path importável: `@opensea/satellite-runtime/<módulo>`.
+Esta é a peça central do pacote. Cada linha é um sub-path importável: `@openholt/satellite-runtime/<módulo>`.
 
 ### Foundation
 
@@ -105,7 +105,7 @@ Distribuído via Git URL — fixe sempre uma tag. No `package.json` do satélite
 ```json
 {
   "dependencies": {
-    "@opensea/satellite-runtime": "git+https://github.com/OpenSea-ERP/OpenSea-Satellite-Runtime.git#v1.0.0"
+    "@openholt/satellite-runtime": "git+https://github.com/OpenSea-ERP/OpenSea-Satellite-Runtime.git#v1.0.0"
   }
 }
 ```
@@ -129,15 +129,15 @@ Peer dependencies, instaladas no app consumidor:
 
 ```ts
 import { app } from 'electron';
-import { setupLog, getLogger } from '@opensea/satellite-runtime/log';
-import { ensureSingleInstance } from '@opensea/satellite-runtime/single-instance';
-import { setupAutoLaunch } from '@opensea/satellite-runtime/auto-launch';
-import { restoreWindowState } from '@opensea/satellite-runtime/window-state';
-import { createSatelliteTray } from '@opensea/satellite-runtime/tray';
+import { setupLog, getLogger } from '@openholt/satellite-runtime/log';
+import { ensureSingleInstance } from '@openholt/satellite-runtime/single-instance';
+import { setupAutoLaunch } from '@openholt/satellite-runtime/auto-launch';
+import { restoreWindowState } from '@openholt/satellite-runtime/window-state';
+import { createSatelliteTray } from '@openholt/satellite-runtime/tray';
 import {
   registerShutdownHandler,
   runShutdownHandlers,
-} from '@opensea/satellite-runtime/graceful-shutdown';
+} from '@openholt/satellite-runtime/graceful-shutdown';
 
 setupLog({ scope: 'my-satellite' });
 ensureSingleInstance();
@@ -168,7 +168,7 @@ app.on('before-quit', async (e) => {
 
 ```ts
 import { z } from 'zod';
-import { createStore } from '@opensea/satellite-runtime/store';
+import { createStore } from '@openholt/satellite-runtime/store';
 
 const store = createStore({
   name: 'settings',
@@ -183,13 +183,13 @@ const url = store.get('apiUrl');
 ### Logger com escopo (`log`)
 
 ```ts
-import { getLogger } from '@opensea/satellite-runtime/log';
+import { getLogger } from '@openholt/satellite-runtime/log';
 
 const logger = getLogger('updater');
 logger.info('checando atualizações...');
 ```
 
-> Também é possível importar tudo a partir da raiz (`@opensea/satellite-runtime`), mas os sub-paths reduzem o que entra no bundle do renderer.
+> Também é possível importar tudo a partir da raiz (`@openholt/satellite-runtime`), mas os sub-paths reduzem o que entra no bundle do renderer.
 
 ## Scaffolding
 

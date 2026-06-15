@@ -18,8 +18,8 @@
     "postinstall": "electron-builder install-app-deps"
   },
   "dependencies": {
-    "@opensea/satellite-contract": "git+https://github.com/OpenSea-ERP/OpenSea-Satellite-Contract.git#v0.1.0",
-    "@opensea/satellite-runtime": "git+https://github.com/OpenSea-ERP/OpenSea-Satellite-Runtime.git#v0.7.0",
+    "@openholt/satellite-contract": "git+https://github.com/OpenSea-ERP/OpenSea-Satellite-Contract.git#v0.1.0",
+    "@openholt/satellite-runtime": "git+https://github.com/OpenSea-ERP/OpenSea-Satellite-Runtime.git#v0.7.0",
     "zod": "^3.23.0"
   },
   "devDependencies": {

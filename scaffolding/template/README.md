@@ -12,7 +12,7 @@ npm run dist:win # produces a Windows installer
 
 ## Architecture
 
-This satellite consumes [`@opensea/satellite-runtime`](https://github.com/OpenSea-ERP/OpenSea-Satellite-Runtime),
+This satellite consumes [`@openholt/satellite-runtime`](https://github.com/OpenSea-ERP/OpenSea-Satellite-Runtime),
 which provides:
 
 - Lifecycle: `auto-launch`, `window-state`, `single-instance`, `tray`,

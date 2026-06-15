@@ -11,7 +11,7 @@
  * `docs/superpowers/specs/2026-05-03-satellite-runtime-connection-design.md`.
  */
 import { EventEmitter } from 'node:events';
-import { fromWireSatelliteKind, type SatelliteKind } from '@opensea/satellite-contract';
+import { fromWireSatelliteKind, type SatelliteKind } from '@openholt/satellite-contract';
 import log from 'electron-log';
 import WebSocket from 'ws';
 

@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to `@opensea/satellite-runtime` will be documented here.
+All notable changes to `@openholt/satellite-runtime` will be documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -60,7 +60,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- New `ui` sub-path (Sub-projeto F) — headless React components for renderers. Imported via `@opensea/satellite-runtime/ui`.
+- New `ui` sub-path (Sub-projeto F) — headless React components for renderers. Imported via `@openholt/satellite-runtime/ui`.
 - `RevokedDialog` — full-screen modal for `device.revoked` events.
 - `AboutDialog` — modal showing app version + channel + build + links.
 - `UpdateBanner` — top banner with status (checking/available/downloading/downloaded/error) + "Reiniciar e instalar" button.
@@ -131,7 +131,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Injectable `WebSocketImpl` and `jitterFn` for deterministic tests.
 - New `connection-state` module — narrow IPC broadcaster for `connection:status` payload, with `isDestroyed()` guard. Does NOT poll or derive from multiple sources; satellites combine WS state + this broadcaster.
 - 35 vitest tests using stateful `FakeWebSocket` (per-instance event control), covering: lifecycle, reconnect, heartbeat cleanup on every path, generation ownership (late close from old socket ignored), routeShared kind filter (canonical + wire), validator drop, swallowed handler throws.
-- `@opensea/satellite-contract` is now a direct dependency (was unused before).
+- `@openholt/satellite-contract` is now a direct dependency (was unused before).
 - New deps: `ws@^8.16.0`, `@types/ws` devDep.
 
 ### Notes
@@ -168,7 +168,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- New `updater` module (Sub-projeto B). Sub-path `@opensea/satellite-runtime/updater`.
+- New `updater` module (Sub-projeto B). Sub-path `@openholt/satellite-runtime/updater`.
 - API: `setupUpdater(options)` (idempotent), `checkForUpdates()`, `quitAndInstall()`, `recordAnnouncedRelease(release)`, `primeUpdaterStore(seed)`.
 - Constants: `RETRY_24H`, `CHECK_INTERVAL_6H`.
 - Internal persistence via `createStore({ name: 'updater.preferences' })` — satellites do not mount the store.

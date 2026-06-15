@@ -2,22 +2,22 @@
  * __SATELLITE_DISPLAY_NAME__ — main process entry.
  *
  * Boot sequence follows the canonical pattern from
- * `@opensea/satellite-runtime`:
+ * `@openholt/satellite-runtime`:
  *   log → ensureSingleInstance → store → window-state → tray → auto-launch →
  *   updater → ws-client → graceful-shutdown.
  */
 
 import path from 'node:path';
-import { setupAutoLaunch } from '@opensea/satellite-runtime/auto-launch';
+import { setupAutoLaunch } from '@openholt/satellite-runtime/auto-launch';
 import {
   registerShutdownHandler,
   runShutdownHandlers,
-} from '@opensea/satellite-runtime/graceful-shutdown';
-import { getLogger, setupLog } from '@opensea/satellite-runtime/log';
-import { ensureSingleInstance } from '@opensea/satellite-runtime/single-instance';
-import { createSatelliteTray } from '@opensea/satellite-runtime/tray';
-import { checkForUpdates, setupUpdater } from '@opensea/satellite-runtime/updater';
-import { restoreWindowState } from '@opensea/satellite-runtime/window-state';
+} from '@openholt/satellite-runtime/graceful-shutdown';
+import { getLogger, setupLog } from '@openholt/satellite-runtime/log';
+import { ensureSingleInstance } from '@openholt/satellite-runtime/single-instance';
+import { createSatelliteTray } from '@openholt/satellite-runtime/tray';
+import { checkForUpdates, setupUpdater } from '@openholt/satellite-runtime/updater';
+import { restoreWindowState } from '@openholt/satellite-runtime/window-state';
 import { app, BrowserWindow } from 'electron';
 
 const APP_NAME = '__SATELLITE_DISPLAY_NAME__';
